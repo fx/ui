@@ -1,11 +1,11 @@
 import { useStreamerMode } from '@/components/streamer-mode-provider'
 
 const STREAMER_COLORS = [
-  'hsl(var(--chart-1))',
-  'hsl(var(--chart-2))',
-  'hsl(var(--chart-3))',
-  'hsl(var(--chart-4))',
-  'hsl(var(--chart-5))',
+  'var(--color-chart-1)',
+  'var(--color-chart-2)',
+  'var(--color-chart-3)',
+  'var(--color-chart-4)',
+  'var(--color-chart-5)',
 ]
 
 function getStreamerColor(label: string): string {
@@ -13,7 +13,7 @@ function getStreamerColor(label: string): string {
   for (let i = 0; i < label.length; i++) {
     hash = (hash * 31 + label.charCodeAt(i)) | 0
   }
-  return STREAMER_COLORS[Math.abs(hash) % STREAMER_COLORS.length] ?? 'hsl(var(--chart-1))'
+  return STREAMER_COLORS[Math.abs(hash) % STREAMER_COLORS.length] ?? 'var(--color-chart-1)'
 }
 
 interface RedactedProps {
@@ -30,7 +30,7 @@ function Redacted({ children, color, label, className }: RedactedProps) {
     return <>{children}</>
   }
 
-  const bgColor = color ?? (label ? getStreamerColor(label) : 'hsl(var(--muted))')
+  const bgColor = color ?? (label ? getStreamerColor(label) : 'var(--color-muted)')
   const width = typeof children === 'string' ? `${Math.max(children.length, 3)}ch` : '8ch'
 
   return (

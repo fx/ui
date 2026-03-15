@@ -134,7 +134,7 @@ describe('Redacted', () => {
 
     await user.click(screen.getByRole('button', { name: 'toggle' }))
     const redacted = document.querySelector('[data-slot="redacted"]') as HTMLElement
-    expect(redacted.style.backgroundColor).toBe('hsl(var(--muted))')
+    expect(redacted.style.backgroundColor).toBe('var(--color-muted)')
   })
 
   it('uses deterministic color when label provided', async () => {
@@ -161,6 +161,6 @@ describe('Redacted', () => {
     await user.click(screen.getByRole('button', { name: 'toggle' }))
     const redacted = document.querySelector('[data-slot="redacted"]') as HTMLElement
     // Should use one of the chart colors, not var(--muted)
-    expect(redacted.style.backgroundColor).toMatch(/hsl\(var\(--chart-\d\)\)/)
+    expect(redacted.style.backgroundColor).toMatch(/var\(--color-chart-\d\)/)
   })
 })
