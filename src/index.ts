@@ -188,6 +188,11 @@ export {
   type SheetTriggerProps,
 } from './components/ui/sheet'
 export { Skeleton, type SkeletonProps } from './components/ui/skeleton'
+export {
+  StatusOverlay,
+  type StatusOverlayProps,
+  statusOverlayVariants,
+} from './components/ui/status-overlay'
 export { Switch, type SwitchProps, switchVariants } from './components/ui/switch'
 export {
   Table,
