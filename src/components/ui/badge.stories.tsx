@@ -1,3 +1,4 @@
+import { Check, X } from 'lucide-react'
 import type { Meta, StoryObj } from 'storybook'
 import { Badge } from './badge'
 
@@ -31,6 +32,44 @@ export const AllVariants: Story = {
           {variant}
         </Badge>
       ))}
+    </div>
+  ),
+}
+
+export const AsLink: Story = {
+  render: () => (
+    <div className="flex items-center gap-2">
+      <Badge asChild>
+        <a href="#default">Default link</a>
+      </Badge>
+      <Badge asChild variant="secondary">
+        <a href="#secondary">Secondary link</a>
+      </Badge>
+      <Badge asChild variant="destructive">
+        <a href="#destructive">Destructive link</a>
+      </Badge>
+      <Badge asChild variant="outline">
+        <a href="#outline">Outline link</a>
+      </Badge>
+    </div>
+  ),
+}
+
+export const IconOnly: Story = {
+  render: () => (
+    <div className="flex items-center gap-2">
+      <Badge>
+        <Check />
+      </Badge>
+      <Badge variant="destructive">
+        <X />
+      </Badge>
+      <Badge variant="secondary">
+        <Check />
+      </Badge>
+      <Badge variant="outline">
+        <X />
+      </Badge>
     </div>
   ),
 }

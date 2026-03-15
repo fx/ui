@@ -47,4 +47,50 @@ describe('Badge', () => {
     render(<Badge className="custom-class">Test</Badge>)
     expect(screen.getByText('Test').className).toContain('custom-class')
   })
+
+  describe('asChild', () => {
+    it('renders child element instead of span when asChild is true', () => {
+      render(
+        <Badge asChild>
+          <a href="/link">Link Badge</a>
+        </Badge>,
+      )
+      const link = screen.getByRole('link', { name: 'Link Badge' })
+      expect(link).toBeInTheDocument()
+      expect(link.tagName).toBe('A')
+      expect(link).toHaveAttribute('href', '/link')
+    })
+
+    it('applies variant classes to child element', () => {
+      render(
+        <Badge asChild variant="destructive">
+          <a href="/delete">Delete</a>
+        </Badge>,
+      )
+      const link = screen.getByRole('link')
+      expect(link.className).toContain('bg-destructive')
+    })
+
+    it('preserves data-slot attribute with asChild', () => {
+      render(
+        <Badge asChild>
+          <a href="/slot">Slot test</a>
+        </Badge>,
+      )
+      const link = screen.getByRole('link')
+      expect(link).toHaveAttribute('data-slot', 'badge')
+    })
+  })
+
+  describe('icon-only auto-sizing', () => {
+    it('includes aspect-square class for icon-only badges', () => {
+      render(
+        <Badge data-testid="icon-badge">
+          <svg data-testid="icon" />
+        </Badge>,
+      )
+      const badge = screen.getByTestId('icon-badge')
+      expect(badge.className).toContain('aspect-square')
+    })
+  })
 })
