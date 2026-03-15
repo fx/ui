@@ -4,7 +4,7 @@ import { Slot } from '@/lib/slot'
 import { cn } from '@/lib/utils'
 
 const badgeVariants = cva(
-  "inline-flex items-center justify-center rounded-none border px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 [&_svg:not([class*='size-'])]:size-3 [&_svg]:shrink-0 [&:has(>svg:only-child)]:p-[3px] [&:has(>svg:only-child)]:aspect-square [&:has(>svg:only-child)>svg]:size-4 w-fit whitespace-nowrap shrink-0 gap-1 [&>svg]:pointer-events-none overflow-hidden",
+  "inline-flex items-center justify-center rounded-none border px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 [&_svg:not([class*='size-'])]:size-3 [&_svg]:shrink-0 [&:has(>svg:only-child)]:p-[3px] [&:has(>svg:only-child)]:aspect-square [&:has(>svg:only-child)>svg:not([class*='size-'])]:size-4 w-fit whitespace-nowrap shrink-0 gap-1 [&>svg]:pointer-events-none overflow-hidden",
   {
     variants: {
       variant: {

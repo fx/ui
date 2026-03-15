@@ -16,7 +16,7 @@ const statusOverlayVariants = cva('absolute flex items-center justify-center rou
 })
 
 interface StatusOverlayProps
-  extends React.HTMLAttributes<HTMLSpanElement>,
+  extends React.ComponentProps<'span'>,
     VariantProps<typeof statusOverlayVariants> {
   /** Whether to show an animated spinning ring around the overlay */
   animated?: boolean
@@ -45,10 +45,12 @@ function StatusOverlay({
   position,
   animated = false,
   children,
+  ref,
   ...props
 }: StatusOverlayProps) {
   return (
     <span
+      ref={ref}
       data-slot="status-overlay"
       className={cn(statusOverlayVariants({ position }), className)}
       {...props}
