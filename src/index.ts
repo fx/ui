@@ -1,5 +1,10 @@
 // Utilities
 
+export {
+  type StreamerModeContextValue,
+  StreamerModeProvider,
+  useStreamerMode,
+} from './components/streamer-mode-provider'
 // Theme
 export { ThemeProvider, useTheme } from './components/theme-provider'
 export { mergeRefs, Slot, type SlotProps } from './lib/slot'
@@ -153,6 +158,7 @@ export {
   type PopoverTriggerProps,
 } from './components/ui/popover'
 export { Progress, type ProgressProps } from './components/ui/progress'
+export { getStreamerColor, Redacted, type RedactedProps } from './components/ui/redacted'
 export {
   Select,
   SelectContent,
