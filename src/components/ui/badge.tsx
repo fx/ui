@@ -11,6 +11,18 @@ const badgeVariants = cva(
         destructive: 'border-transparent bg-destructive text-destructive-foreground',
         outline: 'text-foreground',
         ghost: 'border-transparent text-foreground',
+        working:
+          'border-transparent bg-status-working text-status-working-foreground [a&]:hover:bg-status-working/90',
+        idle: 'border-transparent bg-status-idle text-status-idle-foreground [a&]:hover:bg-status-idle/90',
+        complete:
+          'border-transparent bg-status-complete text-status-complete-foreground [a&]:hover:bg-status-complete/90',
+        failure:
+          'border-transparent bg-status-failure text-status-failure-foreground [a&]:hover:bg-status-failure/90',
+        stale:
+          'border-transparent bg-status-stale text-status-stale-foreground [a&]:hover:bg-status-stale/90',
+        github:
+          'border-transparent bg-secondary text-link-github [a&]:hover:bg-muted-foreground/30',
+        app: 'border-transparent bg-secondary text-link-app [a&]:hover:bg-muted-foreground/30',
       },
     },
     defaultVariants: {
