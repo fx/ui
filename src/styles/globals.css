@@ -29,6 +29,18 @@
   --chart-3: 197 37% 24%;
   --chart-4: 43 74% 66%;
   --chart-5: 27 87% 67%;
+  --status-working: 210 80% 55%;
+  --status-working-foreground: 0 0% 100%;
+  --status-idle: 0 0% 55%;
+  --status-idle-foreground: 0 0% 100%;
+  --status-complete: 142 70% 40%;
+  --status-complete-foreground: 0 0% 100%;
+  --status-failure: 0 72% 51%;
+  --status-failure-foreground: 0 0% 100%;
+  --status-stale: 38 92% 50%;
+  --status-stale-foreground: 0 0% 100%;
+  --link-github: 0 0% 20%;
+  --link-app: 210 80% 55%;
 }
 
 .dark {
@@ -56,6 +68,18 @@
   --chart-3: 30 80% 55%;
   --chart-4: 280 65% 60%;
   --chart-5: 340 75% 55%;
+  --status-working: 210 80% 60%;
+  --status-working-foreground: 0 0% 100%;
+  --status-idle: 0 0% 55%;
+  --status-idle-foreground: 0 0% 100%;
+  --status-complete: 142 70% 45%;
+  --status-complete-foreground: 0 0% 100%;
+  --status-failure: 0 72% 55%;
+  --status-failure-foreground: 0 0% 100%;
+  --status-stale: 38 92% 55%;
+  --status-stale-foreground: 0 0% 100%;
+  --link-github: 0 0% 85%;
+  --link-app: 210 80% 65%;
 }
 
 @theme inline {
@@ -83,6 +107,18 @@
   --color-chart-3: hsl(var(--chart-3));
   --color-chart-4: hsl(var(--chart-4));
   --color-chart-5: hsl(var(--chart-5));
+  --color-status-working: hsl(var(--status-working));
+  --color-status-working-foreground: hsl(var(--status-working-foreground));
+  --color-status-idle: hsl(var(--status-idle));
+  --color-status-idle-foreground: hsl(var(--status-idle-foreground));
+  --color-status-complete: hsl(var(--status-complete));
+  --color-status-complete-foreground: hsl(var(--status-complete-foreground));
+  --color-status-failure: hsl(var(--status-failure));
+  --color-status-failure-foreground: hsl(var(--status-failure-foreground));
+  --color-status-stale: hsl(var(--status-stale));
+  --color-status-stale-foreground: hsl(var(--status-stale-foreground));
+  --color-link-github: hsl(var(--link-github));
+  --color-link-app: hsl(var(--link-app));
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
