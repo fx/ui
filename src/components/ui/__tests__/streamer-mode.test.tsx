@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { StreamerModeProvider, useStreamerMode } from '../../streamer-mode-provider'
 import { Redacted } from '../redacted'
 
@@ -134,7 +134,7 @@ describe('Redacted', () => {
 
     await user.click(screen.getByRole('button', { name: 'toggle' }))
     const redacted = document.querySelector('[data-slot="redacted"]') as HTMLElement
-    expect(redacted.style.backgroundColor).toBe('var(--muted)')
+    expect(redacted.style.backgroundColor).toBe('hsl(var(--muted))')
   })
 
   it('uses deterministic color when label provided', async () => {
@@ -161,6 +161,6 @@ describe('Redacted', () => {
     await user.click(screen.getByRole('button', { name: 'toggle' }))
     const redacted = document.querySelector('[data-slot="redacted"]') as HTMLElement
     // Should use one of the chart colors, not var(--muted)
-    expect(redacted.style.backgroundColor).toMatch(/var\(--chart-\d\)/)
+    expect(redacted.style.backgroundColor).toMatch(/hsl\(var\(--chart-\d\)\)/)
   })
 })
