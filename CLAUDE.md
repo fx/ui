@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-`@fx/ui` — React component library. 28 components built on Base UI primitives with Tailwind CSS v4 and neutral greyscale HSL theming.
+`@fx/ui` — React component library. 28 components built on Base UI primitives with Tailwind CSS v4 and neutral greyscale oklch theming.
 
 ## IMPORTANT: Public Repository Rules
 
@@ -36,7 +36,7 @@ bun run build-storybook  # Build static Storybook
 
 **Barrel export:** `src/index.ts` re-exports everything. Every public component, type, and variant function must be exported here.
 
-**Theming:** `src/styles/globals.css` defines HSL CSS variables (`:root` for light, `.dark` for dark) mapped to Tailwind via `@theme inline` blocks. Neutral greyscale only — no color presets. `ThemeProvider` in `src/components/theme-provider.tsx` manages light/dark/system with localStorage persistence and `.dark` class on `<html>`.
+**Theming:** `src/styles/globals.css` defines oklch CSS variables (`:root` for light, `.dark` for dark) mapped to Tailwind via `@theme inline` blocks using direct `var()` references (color-space agnostic). Neutral greyscale only — no color presets. Consumers can override `:root`/`.dark` with any color space. `ThemeProvider` in `src/components/theme-provider.tsx` manages light/dark/system with localStorage persistence and `.dark` class on `<html>`.
 
 **Path alias:** `@/` maps to `src/` (configured in both `tsconfig.json` and `vite.config.ts`).
 

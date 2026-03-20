@@ -12,11 +12,11 @@ import {
 const testConfig: ChartConfig = {
   value: {
     label: 'Value',
-    color: 'hsl(var(--chart-1))',
+    color: 'var(--chart-1)',
   },
   count: {
     label: 'Count',
-    color: 'hsl(var(--chart-2))',
+    color: 'var(--chart-2)',
   },
 }
 
@@ -57,8 +57,8 @@ describe('ChartContainer', () => {
       </ChartContainer>,
     )
     const el = screen.getByTestId('chart')
-    expect(el.style.getPropertyValue('--color-value')).toBe('hsl(var(--chart-1))')
-    expect(el.style.getPropertyValue('--color-count')).toBe('hsl(var(--chart-2))')
+    expect(el.style.getPropertyValue('--color-value')).toBe('var(--chart-1)')
+    expect(el.style.getPropertyValue('--color-count')).toBe('var(--chart-2)')
   })
 
   it('sets data-chart attribute with unique id', () => {
