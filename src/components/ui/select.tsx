@@ -2,6 +2,7 @@ import { Select as BaseSelect } from '@base-ui-components/react/select'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { Check, ChevronDown, ChevronUp } from 'lucide-react'
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
 
 const selectTriggerVariants = cva(
@@ -102,7 +103,7 @@ function SelectContent({
   ...props
 }: SelectContentProps) {
   return (
-    <BaseSelect.Portal>
+    <BaseSelect.Portal className="fixed inset-0 z-[60] pointer-events-none [&>*]:pointer-events-auto">
       <BaseSelect.Positioner
         side={side}
         align={align}
@@ -111,7 +112,7 @@ function SelectContent({
         <BaseSelect.Popup
           data-slot="select-content"
           className={cn(
-            'relative z-50 max-h-[min(var(--available-height),24rem)] w-[var(--anchor-width)] overflow-y-auto overflow-x-hidden border bg-popover p-1 text-popover-foreground shadow-md',
+            'relative z-[60] max-h-[min(var(--available-height),24rem)] w-[var(--anchor-width)] overflow-y-auto overflow-x-hidden border bg-popover p-1 text-popover-foreground shadow-md',
             className,
           )}
           {...props}
