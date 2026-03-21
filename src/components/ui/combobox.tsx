@@ -89,12 +89,12 @@ function ComboboxContent({
   ...props
 }: React.ComponentPropsWithRef<typeof BaseCombobox.Popup>) {
   return (
-    <BaseCombobox.Portal>
+    <BaseCombobox.Portal className="fixed inset-0 z-[60] pointer-events-none [&>*]:pointer-events-auto">
       <BaseCombobox.Positioner sideOffset={-1}>
         <BaseCombobox.Popup
           data-slot="combobox-content"
           className={cn(
-            'relative z-50 max-h-[min(var(--available-height),24rem)] -ml-px w-[calc(var(--anchor-width)+2px)] overflow-y-auto overflow-x-hidden border border-t-0 border-ring bg-popover p-1 text-popover-foreground shadow-md',
+            'relative z-[60] max-h-[min(var(--available-height),24rem)] -ml-px w-[calc(var(--anchor-width)+2px)] overflow-y-auto overflow-x-hidden border border-t-0 border-ring bg-popover p-1 text-popover-foreground shadow-md',
             className,
           )}
           {...props}
