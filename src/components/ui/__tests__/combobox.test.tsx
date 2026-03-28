@@ -465,6 +465,33 @@ describe('Combobox', () => {
       expect(screen.queryByTestId('trigger')).not.toBeInTheDocument()
     })
 
+    it('matches defaultValue by structural equality (not referential)', () => {
+      render(
+        <Combobox
+          items={fruits}
+          variant="dropdown"
+          defaultValue={{ label: 'Cherry', value: 'cherry' }}
+        >
+          <ComboboxAnchor>
+            <ComboboxInput placeholder="Select fruit..." />
+            <ComboboxTrigger />
+          </ComboboxAnchor>
+          <ComboboxContent>
+            <ComboboxSearch placeholder="Search..." />
+            <ComboboxList>
+              {(item: Fruit) => (
+                <ComboboxItem key={item.value} value={item}>
+                  {item.label}
+                </ComboboxItem>
+              )}
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>,
+      )
+      // A new object with matching shape should resolve to the selected value
+      expect(screen.getByText('Cherry')).toBeInTheDocument()
+    })
+
     it('renders ComboboxSearch with data-slot', () => {
       render(
         <Combobox items={fruits} variant="dropdown" defaultOpen>
