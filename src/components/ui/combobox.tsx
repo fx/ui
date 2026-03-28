@@ -1,6 +1,6 @@
 import { Combobox as BaseCombobox } from '@base-ui-components/react/combobox'
 import { cva } from 'class-variance-authority'
-import { Check, ChevronDown, ChevronsUpDown, Search } from 'lucide-react'
+import { Check, ChevronDown, ChevronsUpDown, Search, X } from 'lucide-react'
 import * as React from 'react'
 import { cn } from '@/lib/utils'
 
@@ -30,7 +30,7 @@ function useComboboxContext() {
 // ---------------------------------------------------------------------------
 
 const comboboxInputVariants = cva(
-  'placeholder:text-muted-foreground flex w-full min-w-0 bg-transparent outline-none disabled:pointer-events-none disabled:opacity-50',
+  'placeholder:text-muted-foreground flex flex-1 min-w-0 min-w-[4rem] bg-transparent outline-none disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       size: {
@@ -162,6 +162,7 @@ const comboboxAnchorVariants = cva('relative transition-colors', {
   variants: {
     variant: {
       default: [
+        'flex flex-wrap items-center gap-1 p-1',
         'border border-input',
         'focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]',
         'has-[[data-popup-open]]:border-b-transparent has-[[data-popup-open]]:ring-0',
@@ -264,6 +265,19 @@ function ComboboxInput({ className, placeholder, ...props }: ComboboxInputProps)
       >
         <BaseCombobox.Value>
           {(value: unknown) => {
+            if (Array.isArray(value)) {
+              if (value.length > 0) {
+                const labels = value.map((v: unknown) =>
+                  typeof v === 'object' && v !== null && 'label' in v
+                    ? String((v as { label: unknown }).label)
+                    : String(v),
+                )
+                return <span className="truncate">{labels.join(', ')}</span>
+              }
+              return (
+                <span className="truncate text-muted-foreground">{placeholder ?? 'Select...'}</span>
+              )
+            }
             if (value != null) {
               const label =
                 typeof value === 'object' && value !== null && 'label' in value
@@ -490,6 +504,133 @@ function ComboboxSeparator({ className, ...props }: React.HTMLAttributes<HTMLDiv
 }
 
 // ---------------------------------------------------------------------------
+// ComboboxChips — container for multi-select chips (render function pattern)
+// ---------------------------------------------------------------------------
+
+const comboboxChipsVariants = cva('flex flex-wrap items-center gap-1', {
+  variants: {
+    size: {
+      default: '',
+      xs: '',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+  },
+})
+
+interface ComboboxChipsProps
+  extends Omit<React.ComponentPropsWithRef<typeof BaseCombobox.Chips>, 'children'> {
+  children?: React.ReactNode | ((value: unknown, index: number) => React.ReactNode)
+}
+
+function ComboboxChips({ className, children, ...props }: ComboboxChipsProps) {
+  const { size } = useComboboxContext()
+
+  if (typeof children === 'function') {
+    const renderFn = children
+    return (
+      <BaseCombobox.Chips
+        data-slot="combobox-chips"
+        className={cn(comboboxChipsVariants({ size }), className)}
+        {...props}
+      >
+        <BaseCombobox.Value>
+          {(value: unknown) => {
+            if (Array.isArray(value)) {
+              return value.map((v: unknown, i: number) => renderFn(v, i))
+            }
+            return null
+          }}
+        </BaseCombobox.Value>
+      </BaseCombobox.Chips>
+    )
+  }
+
+  return (
+    <BaseCombobox.Chips
+      data-slot="combobox-chips"
+      className={cn(comboboxChipsVariants({ size }), className)}
+      {...props}
+    >
+      {children}
+    </BaseCombobox.Chips>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// ComboboxChip — individual chip for a selected value
+// ---------------------------------------------------------------------------
+
+const comboboxChipVariants = cva(
+  'inline-flex items-center gap-1 rounded border border-border bg-muted text-foreground',
+  {
+    variants: {
+      size: {
+        default: 'text-xs h-6 px-2',
+        xs: 'text-[0.65rem] h-5 px-1.5',
+      },
+    },
+    defaultVariants: {
+      size: 'default',
+    },
+  },
+)
+
+function ComboboxChip({
+  className,
+  children,
+  ...props
+}: React.ComponentPropsWithRef<typeof BaseCombobox.Chip>) {
+  const { size } = useComboboxContext()
+  return (
+    <BaseCombobox.Chip
+      data-slot="combobox-chip"
+      className={cn(comboboxChipVariants({ size }), className)}
+      {...props}
+    >
+      {children}
+    </BaseCombobox.Chip>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// ComboboxChipRemove — remove button inside a chip
+// ---------------------------------------------------------------------------
+
+const comboboxChipRemoveVariants = cva(
+  'inline-flex items-center justify-center shrink-0 cursor-pointer opacity-70 hover:opacity-100',
+  {
+    variants: {
+      size: {
+        default: '',
+        xs: '',
+      },
+    },
+    defaultVariants: {
+      size: 'default',
+    },
+  },
+)
+
+function ComboboxChipRemove({
+  className,
+  children,
+  ...props
+}: React.ComponentPropsWithRef<typeof BaseCombobox.ChipRemove>) {
+  const { size } = useComboboxContext()
+  return (
+    <BaseCombobox.ChipRemove
+      data-slot="combobox-chip-remove"
+      className={cn(comboboxChipRemoveVariants({ size }), className)}
+      {...props}
+    >
+      {children ?? <X className="size-3" />}
+    </BaseCombobox.ChipRemove>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // Exports
 // ---------------------------------------------------------------------------
 
@@ -497,6 +638,12 @@ export {
   Combobox,
   ComboboxAnchor,
   comboboxAnchorVariants,
+  ComboboxChip,
+  comboboxChipRemoveVariants,
+  ComboboxChipRemove,
+  comboboxChipVariants,
+  ComboboxChips,
+  comboboxChipsVariants,
   ComboboxContent,
   comboboxDropdownTriggerVariants,
   ComboboxEmpty,
@@ -515,6 +662,7 @@ export {
   useComboboxContext,
 }
 export type {
+  ComboboxChipsProps,
   ComboboxContextValue,
   ComboboxInputProps,
   ComboboxItemProps,
