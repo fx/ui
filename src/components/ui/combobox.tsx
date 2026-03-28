@@ -389,8 +389,7 @@ function ComboboxContent({
             'relative z-[60] max-h-[min(var(--available-height),24rem)] overflow-y-auto overflow-x-hidden bg-popover p-1 text-popover-foreground shadow-md',
             variant === 'default' &&
               '-ml-px w-[calc(var(--anchor-width)+2px)] border border-t-0 border-ring',
-            variant === 'dropdown' &&
-              'w-[max(var(--anchor-width),12rem)] rounded-md border border-border',
+            variant === 'dropdown' && 'min-w-[12rem] max-w-[20rem] rounded-md border border-border',
             className,
           )}
           {...props}
