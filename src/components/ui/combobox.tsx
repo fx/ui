@@ -205,15 +205,22 @@ interface ComboboxProps<Value, Multiple extends boolean | undefined = false>
   variant?: ComboboxVariant
 }
 
+function defaultIsItemEqualToValue<Value>(a: Value, b: Value): boolean {
+  if (Object.is(a, b)) return true
+  if (typeof a !== 'object' || typeof b !== 'object' || a === null || b === null) return false
+  return JSON.stringify(a) === JSON.stringify(b)
+}
+
 function Combobox<Value, Multiple extends boolean | undefined = false>({
   size = 'default',
   variant = 'default',
+  isItemEqualToValue = defaultIsItemEqualToValue,
   ...props
 }: ComboboxProps<Value, Multiple>) {
   const ctx = React.useMemo(() => ({ size, variant }), [size, variant])
   return (
     <ComboboxContext.Provider value={ctx}>
-      <BaseCombobox.Root data-slot="combobox" {...props} />
+      <BaseCombobox.Root data-slot="combobox" isItemEqualToValue={isItemEqualToValue} {...props} />
     </ComboboxContext.Provider>
   )
 }
