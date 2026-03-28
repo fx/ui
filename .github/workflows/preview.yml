@@ -3,6 +3,10 @@ name: Preview
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+      - '**/*.md'
 
 permissions:
   contents: read
