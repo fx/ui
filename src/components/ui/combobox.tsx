@@ -14,11 +14,13 @@ type ComboboxSize = 'default' | 'xs'
 interface ComboboxContextValue {
   size: ComboboxSize
   variant: ComboboxVariant
+  anchorRef: React.RefObject<HTMLDivElement | null>
 }
 
 const ComboboxContext = React.createContext<ComboboxContextValue>({
   size: 'default',
   variant: 'default',
+  anchorRef: { current: null },
 })
 
 function useComboboxContext() {
@@ -225,7 +227,8 @@ function Combobox<Value, Multiple extends boolean | undefined = false>({
   isItemEqualToValue = defaultIsItemEqualToValue,
   ...props
 }: ComboboxProps<Value, Multiple>) {
-  const ctx = React.useMemo(() => ({ size, variant }), [size, variant])
+  const anchorRef = React.useRef<HTMLDivElement>(null)
+  const ctx = React.useMemo(() => ({ size, variant, anchorRef }), [size, variant])
   return (
     <ComboboxContext.Provider value={ctx}>
       <BaseCombobox.Root data-slot="combobox" isItemEqualToValue={isItemEqualToValue} {...props} />
@@ -239,11 +242,19 @@ function Combobox<Value, Multiple extends boolean | undefined = false>({
 
 function ComboboxAnchor({
   className,
+  ref,
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> }) {
-  const { variant } = useComboboxContext()
+  const { variant, anchorRef } = useComboboxContext()
   return (
     <div
+      ref={(node) => {
+        // Set context ref for positioner anchor tracking
+        ;(anchorRef as React.MutableRefObject<HTMLDivElement | null>).current = node
+        // Forward consumer ref
+        if (typeof ref === 'function') ref(node)
+        else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node
+      }}
       data-slot="combobox-anchor"
       className={cn(comboboxAnchorVariants({ variant }), className)}
       {...props}
@@ -378,11 +389,14 @@ function ComboboxContent({
   children,
   ...props
 }: React.ComponentPropsWithRef<typeof BaseCombobox.Popup>) {
-  const { variant } = useComboboxContext()
+  const { variant, anchorRef } = useComboboxContext()
 
   return (
     <BaseCombobox.Portal className="fixed inset-0 z-[60] pointer-events-none [&>*]:pointer-events-auto">
-      <BaseCombobox.Positioner sideOffset={variant === 'dropdown' ? 4 : -1}>
+      <BaseCombobox.Positioner
+        sideOffset={variant === 'dropdown' ? 4 : -1}
+        anchor={variant === 'default' ? anchorRef : undefined}
+      >
         <BaseCombobox.Popup
           data-slot="combobox-content"
           className={cn(

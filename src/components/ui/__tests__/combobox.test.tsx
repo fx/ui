@@ -591,7 +591,7 @@ describe('Combobox', () => {
           <Consumer />
         </Combobox>,
       )
-      expect(ctxValue).toEqual({ size: 'default', variant: 'default' })
+      expect(ctxValue).toMatchObject({ size: 'default', variant: 'default' })
     })
 
     it('provides xs size', () => {
@@ -605,7 +605,7 @@ describe('Combobox', () => {
           <Consumer />
         </Combobox>,
       )
-      expect(ctxValue).toEqual({ size: 'xs', variant: 'default' })
+      expect(ctxValue).toMatchObject({ size: 'xs', variant: 'default' })
     })
 
     it('provides dropdown variant', () => {
@@ -619,7 +619,7 @@ describe('Combobox', () => {
           <Consumer />
         </Combobox>,
       )
-      expect(ctxValue).toEqual({ size: 'default', variant: 'dropdown' })
+      expect(ctxValue).toMatchObject({ size: 'default', variant: 'dropdown' })
     })
 
     it('provides dropdown variant with xs size', () => {
@@ -633,7 +633,7 @@ describe('Combobox', () => {
           <Consumer />
         </Combobox>,
       )
-      expect(ctxValue).toEqual({ size: 'xs', variant: 'dropdown' })
+      expect(ctxValue).toMatchObject({ size: 'xs', variant: 'dropdown' })
     })
   })
 
