@@ -217,7 +217,7 @@ export const DropdownWithPreselection: Story = {
       <Combobox
         items={fruits}
         variant="dropdown"
-        defaultValue={{ label: 'Cherry', value: 'cherry' }}
+        defaultValue={fruits.find((f) => f.value === 'cherry')}
       >
         <ComboboxAnchor>
           <ComboboxInput placeholder="Select fruit..." />
