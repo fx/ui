@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { createRef } from 'react'
 import { describe, expect, it } from 'vitest'
 import {
@@ -831,6 +832,90 @@ describe('Combobox', () => {
       for (const btn of removeButtons) {
         expect(btn.querySelector('svg')).toBeInTheDocument()
       }
+    })
+
+    it('has data-slot on ComboboxChips container', () => {
+      render(
+        <Combobox items={fruits} multiple defaultValue={[{ label: 'Apple', value: 'apple' }]}>
+          <ComboboxAnchor>
+            <ComboboxChips>
+              {(value: unknown) => {
+                const item = value as Fruit
+                return (
+                  <ComboboxChip key={item.value}>
+                    {item.label}
+                    <ComboboxChipRemove />
+                  </ComboboxChip>
+                )
+              }}
+            </ComboboxChips>
+            <ComboboxInput placeholder="Search fruits..." />
+            <ComboboxTrigger />
+          </ComboboxAnchor>
+          <ComboboxContent>
+            <ComboboxEmpty />
+            <ComboboxList>
+              {(item: Fruit) => (
+                <ComboboxItem key={item.value} value={item}>
+                  {item.label}
+                </ComboboxItem>
+              )}
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>,
+      )
+      expect(getBySlot('combobox-chips')).toBeInTheDocument()
+    })
+
+    it('removes a chip when clicking the remove button', async () => {
+      const user = userEvent.setup()
+      render(
+        <Combobox
+          items={fruits}
+          multiple
+          defaultValue={[
+            { label: 'Apple', value: 'apple' },
+            { label: 'Cherry', value: 'cherry' },
+          ]}
+        >
+          <ComboboxAnchor>
+            <ComboboxChips>
+              {(value: unknown) => {
+                const item = value as Fruit
+                return (
+                  <ComboboxChip key={item.value}>
+                    {item.label}
+                    <ComboboxChipRemove />
+                  </ComboboxChip>
+                )
+              }}
+            </ComboboxChips>
+            <ComboboxInput placeholder="Search fruits..." />
+            <ComboboxTrigger />
+          </ComboboxAnchor>
+          <ComboboxContent>
+            <ComboboxEmpty />
+            <ComboboxList>
+              {(item: Fruit) => (
+                <ComboboxItem key={item.value} value={item}>
+                  {item.label}
+                </ComboboxItem>
+              )}
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>,
+      )
+      // Should start with 2 chips
+      expect(document.querySelectorAll('[data-slot="combobox-chip"]').length).toBe(2)
+
+      // Click the first remove button
+      const removeButtons = document.querySelectorAll('[data-slot="combobox-chip-remove"]')
+      await user.click(removeButtons[0]!)
+
+      // Should have 1 chip remaining
+      await waitFor(() => {
+        expect(document.querySelectorAll('[data-slot="combobox-chip"]').length).toBe(1)
+      })
     })
   })
 })
