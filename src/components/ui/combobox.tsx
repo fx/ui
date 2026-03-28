@@ -170,7 +170,8 @@ const comboboxAnchorVariants = cva('relative transition-colors', {
       dropdown: [
         'inline-flex items-center border border-transparent rounded-md',
         'hover:bg-muted/50 hover:border-border',
-        'has-[[data-popup-open]]:bg-muted/50 has-[[data-popup-open]]:border-border',
+        'focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]',
+        'has-[[data-popup-open]]:bg-muted/50 has-[[data-popup-open]]:border-border has-[[data-popup-open]]:ring-0',
       ],
     },
   },
@@ -241,23 +242,18 @@ function ComboboxAnchor({
 
 interface ComboboxInputProps extends React.ComponentPropsWithRef<typeof BaseCombobox.Input> {}
 
-function ComboboxInput({ className, placeholder, disabled, ...props }: ComboboxInputProps) {
+function ComboboxInput({ className, placeholder, ...props }: ComboboxInputProps) {
   const { size, variant } = useComboboxContext()
 
   if (variant === 'dropdown') {
-    // Extract data-* and aria-* attributes to forward to the trigger
-    const forwardedProps: Record<string, unknown> = {}
-    for (const key of Object.keys(props)) {
-      if (key.startsWith('data-') || key.startsWith('aria-')) {
-        forwardedProps[key] = (props as Record<string, unknown>)[key]
-      }
-    }
+    // Forward all props (disabled, ref, event handlers, aria/data attrs) to the trigger.
+    // Input-specific props like `value`/`onChange` are harmless on a button element.
+    const { value: _value, onChange: _onChange, ...triggerProps } = props as Record<string, unknown>
     return (
       <BaseCombobox.Trigger
         data-slot="combobox-input"
         className={cn(comboboxDropdownTriggerVariants({ size }), className)}
-        disabled={disabled}
-        {...forwardedProps}
+        {...(triggerProps as React.ComponentPropsWithRef<typeof BaseCombobox.Trigger>)}
       >
         <BaseCombobox.Value>
           {(value: unknown) => {
@@ -283,7 +279,6 @@ function ComboboxInput({ className, placeholder, disabled, ...props }: ComboboxI
       data-slot="combobox-input"
       className={cn(comboboxInputVariants({ size }), className)}
       placeholder={placeholder}
-      disabled={disabled}
       {...props}
     />
   )
