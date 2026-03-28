@@ -585,7 +585,7 @@ function ComboboxChip({
 // ---------------------------------------------------------------------------
 
 const comboboxChipRemoveVariants = cva(
-  'inline-flex items-center justify-center shrink-0 cursor-pointer opacity-70 hover:opacity-100',
+  'inline-flex items-center justify-center shrink-0 cursor-pointer rounded-sm opacity-70 hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
 )
 
 function ComboboxChipRemove({
@@ -594,10 +594,12 @@ function ComboboxChipRemove({
   ...props
 }: React.ComponentPropsWithRef<typeof BaseCombobox.ChipRemove>) {
   const { size } = useComboboxContext()
+  const hasChildren = children != null
   return (
     <BaseCombobox.ChipRemove
       data-slot="combobox-chip-remove"
       className={cn(comboboxChipRemoveVariants(), className)}
+      {...(!hasChildren && !('aria-label' in props) ? { 'aria-label': 'Remove' } : {})}
       {...props}
     >
       {children ?? <X className={comboboxIconSizeVariants({ size })} />}
