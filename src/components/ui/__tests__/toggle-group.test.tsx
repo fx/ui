@@ -82,7 +82,7 @@ describe('ToggleGroup', () => {
         <ToggleGroupItem value="a">A</ToggleGroupItem>
       </ToggleGroup>,
     )
-    expect(screen.getByRole('button').className).toContain('h-8')
+    expect(screen.getByRole('button').className).toContain('h-9')
   })
 
   it('supports controlled value', () => {

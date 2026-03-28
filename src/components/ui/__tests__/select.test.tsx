@@ -68,7 +68,7 @@ describe('Select', () => {
         </SelectContent>
       </Select>,
     )
-    expect(screen.getByRole('combobox').className).toContain('h-8')
+    expect(screen.getByRole('combobox').className).toContain('h-9')
   })
 
   it('merges custom className on trigger', () => {

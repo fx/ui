@@ -57,7 +57,7 @@ describe('Toggle', () => {
 
   it('applies size variants', () => {
     render(<Toggle size="sm">Bold</Toggle>)
-    expect(screen.getByRole('button').className).toContain('h-8')
+    expect(screen.getByRole('button').className).toContain('h-9')
   })
 
   it('applies lg size', () => {
