@@ -56,6 +56,18 @@ const comboboxTriggerVariants = cva('absolute inset-y-0 right-0 flex items-cente
   },
 })
 
+const comboboxIconSizeVariants = cva('', {
+  variants: {
+    size: {
+      default: 'size-4',
+      xs: 'size-3',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+  },
+})
+
 const comboboxTriggerIconVariants = cva('opacity-50 shrink-0', {
   variants: {
     size: {
@@ -100,6 +112,45 @@ const comboboxGroupLabelVariants = cva('font-medium text-muted-foreground', {
     size: {
       default: 'px-2 py-1.5 text-xs',
       xs: 'px-1.5 py-1 text-[0.65rem]',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+  },
+})
+
+const comboboxSearchWrapperVariants = cva('flex items-center gap-2 border-b border-border px-2', {
+  variants: {
+    size: {
+      default: 'py-1.5',
+      xs: 'py-1',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+  },
+})
+
+const comboboxSearchInputVariants = cva(
+  'w-full bg-transparent outline-none placeholder:text-muted-foreground',
+  {
+    variants: {
+      size: {
+        default: 'text-sm h-6',
+        xs: 'text-xs h-5',
+      },
+    },
+    defaultVariants: {
+      size: 'default',
+    },
+  },
+)
+
+const comboboxEmptyVariants = cva('empty:hidden text-center text-muted-foreground', {
+  variants: {
+    size: {
+      default: 'py-6 text-sm',
+      xs: 'py-4 text-xs',
     },
   },
   defaultVariants: {
@@ -188,12 +239,9 @@ function ComboboxAnchor({
 // ComboboxInput
 // ---------------------------------------------------------------------------
 
-interface ComboboxInputProps extends React.ComponentPropsWithRef<typeof BaseCombobox.Input> {
-  /** Display text shown in the dropdown variant trigger when no placeholder is active */
-  displayValue?: string
-}
+interface ComboboxInputProps extends React.ComponentPropsWithRef<typeof BaseCombobox.Input> {}
 
-function ComboboxInput({ className, displayValue, placeholder, ...props }: ComboboxInputProps) {
+function ComboboxInput({ className, placeholder, ...props }: ComboboxInputProps) {
   const { size, variant } = useComboboxContext()
 
   if (variant === 'dropdown') {
@@ -205,19 +253,18 @@ function ComboboxInput({ className, displayValue, placeholder, ...props }: Combo
         <BaseCombobox.Value>
           {(value: unknown) => {
             if (value != null) {
-              const item = value as Record<string, unknown>
-              return <span className="truncate">{String(item.label ?? item.value ?? value)}</span>
+              const label =
+                typeof value === 'object' && value !== null && 'label' in value
+                  ? String((value as { label: unknown }).label)
+                  : String(value)
+              return <span className="truncate">{label}</span>
             }
             return (
-              <span className="truncate text-muted-foreground">
-                {displayValue ?? placeholder ?? 'Select...'}
-              </span>
+              <span className="truncate text-muted-foreground">{placeholder ?? 'Select...'}</span>
             )
           }}
         </BaseCombobox.Value>
-        <ChevronDown
-          className={cn(comboboxTriggerIconVariants({ size }), 'ml-1 opacity-50 shrink-0')}
-        />
+        <ChevronDown className={cn(comboboxTriggerIconVariants({ size }), 'ml-1')} />
       </BaseCombobox.Trigger>
     )
   }
@@ -285,23 +332,12 @@ interface ComboboxSearchProps
 function ComboboxSearch({ className, ...props }: ComboboxSearchProps) {
   const { size } = useComboboxContext()
   return (
-    <div
-      data-slot="combobox-search"
-      className={cn(
-        'flex items-center gap-2 border-b border-border px-2',
-        size === 'xs' ? 'py-1' : 'py-1.5',
-      )}
-    >
+    <div data-slot="combobox-search" className={cn(comboboxSearchWrapperVariants({ size }))}>
       <Search
-        className={cn('shrink-0 text-muted-foreground', size === 'xs' ? 'size-3' : 'size-4')}
+        className={cn('shrink-0 text-muted-foreground', comboboxIconSizeVariants({ size }))}
       />
       <BaseCombobox.Input
-        className={cn(
-          'w-full bg-transparent outline-none placeholder:text-muted-foreground',
-          size === 'xs' ? 'text-xs h-5' : 'text-sm h-6',
-          className,
-        )}
-        // eslint-disable-next-line jsx-a11y/no-autofocus
+        className={cn(comboboxSearchInputVariants({ size }), className)}
         autoFocus
         {...props}
       />
@@ -366,11 +402,7 @@ function ComboboxEmpty({
   return (
     <BaseCombobox.Empty
       data-slot="combobox-empty"
-      className={cn(
-        'empty:hidden text-center text-muted-foreground',
-        size === 'xs' ? 'py-4 text-xs' : 'py-6 text-sm',
-        className,
-      )}
+      className={cn(comboboxEmptyVariants({ size }), className)}
       {...props}
     >
       {children ?? 'No results found.'}
@@ -393,7 +425,7 @@ function ComboboxItem({ className, children, ...props }: ComboboxItemProps) {
       {...props}
     >
       <BaseCombobox.ItemIndicator className={cn(comboboxItemIndicatorVariants({ size }))}>
-        <Check className={size === 'xs' ? 'size-3' : 'size-4'} />
+        <Check className={comboboxIconSizeVariants({ size })} />
       </BaseCombobox.ItemIndicator>
       {children}
     </BaseCombobox.Item>
