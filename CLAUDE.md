@@ -78,3 +78,7 @@ Stories live alongside components at `src/components/ui/[component].stories.tsx`
 ## Husky
 
 Husky v9 — `.husky/pre-commit` does NOT need a shebang. It runs `npx lint-staged` which applies Biome to staged files.
+
+## Task Tracking
+
+**You MUST load the `/project-management` skill before creating, modifying, or completing any task.** It owns all task-tracking rules and knows where tasks belong. Do not manage tasks without it.

@@ -1,0 +1,17 @@
+# Documentation Index
+# Auto-updated by /spec-writer and /project-management skills
+
+specs:
+  # - name: <spec-name>
+  #   path: specs/<spec-name>/
+  #   description: <one-line description>
+  #   status: active | deprecated
+
+changes:
+  # - id: "NNNN"
+  #   name: <change-name>
+  #   path: changes/NNNN-<change-name>.md
+  #   description: <one-line description>
+  #   spec: <spec-name>
+  #   status: draft | in-progress | complete
+  #   depends_on: []
