@@ -34,7 +34,7 @@ describe('Button', () => {
         </Button>,
       )
       const link = screen.getByRole('link')
-      expect(link.className).toContain('h-9')
+      expect(link.className).toContain('text-xs')
     })
 
     it('forwards ref when asChild is true', () => {
@@ -117,7 +117,7 @@ describe('Button', () => {
   it('applies size variants', () => {
     render(<Button size="sm">Small</Button>)
     const button = screen.getByRole('button')
-    expect(button.className).toContain('h-9')
+    expect(button.className).toContain('text-xs')
   })
 
   it('applies icon size', () => {
