@@ -9,6 +9,7 @@ import {
   ComboboxItem,
   ComboboxLabel,
   ComboboxList,
+  ComboboxSearch,
   ComboboxTrigger,
 } from './combobox'
 
@@ -120,6 +121,110 @@ export const Disabled: Story = {
           <ComboboxTrigger />
         </ComboboxAnchor>
         <ComboboxContent>
+          <ComboboxEmpty />
+          <ComboboxList>
+            {(item: Item) => (
+              <ComboboxItem key={item.value} value={item}>
+                {item.label}
+              </ComboboxItem>
+            )}
+          </ComboboxList>
+        </ComboboxContent>
+      </Combobox>
+    </div>
+  ),
+}
+
+export const Xs: Story = {
+  render: () => (
+    <div className="w-56">
+      <Combobox items={fruits} size="xs">
+        <ComboboxAnchor>
+          <ComboboxInput placeholder="Search fruits..." />
+          <ComboboxTrigger />
+        </ComboboxAnchor>
+        <ComboboxContent>
+          <ComboboxEmpty />
+          <ComboboxList>
+            {(item: Item) => (
+              <ComboboxItem key={item.value} value={item}>
+                {item.label}
+              </ComboboxItem>
+            )}
+          </ComboboxList>
+        </ComboboxContent>
+      </Combobox>
+    </div>
+  ),
+}
+
+export const Dropdown: Story = {
+  render: () => (
+    <div className="flex items-center gap-2">
+      <span className="text-sm text-muted-foreground">Fruit:</span>
+      <Combobox items={fruits} variant="dropdown">
+        <ComboboxAnchor>
+          <ComboboxInput placeholder="Select fruit..." />
+          <ComboboxTrigger />
+        </ComboboxAnchor>
+        <ComboboxContent>
+          <ComboboxSearch placeholder="Search..." />
+          <ComboboxEmpty />
+          <ComboboxList>
+            {(item: Item) => (
+              <ComboboxItem key={item.value} value={item}>
+                {item.label}
+              </ComboboxItem>
+            )}
+          </ComboboxList>
+        </ComboboxContent>
+      </Combobox>
+    </div>
+  ),
+}
+
+export const DropdownXs: Story = {
+  name: 'Dropdown xs',
+  render: () => (
+    <div className="flex items-center gap-2">
+      <span className="text-xs text-muted-foreground">Fruit:</span>
+      <Combobox items={fruits} variant="dropdown" size="xs">
+        <ComboboxAnchor>
+          <ComboboxInput placeholder="Select fruit..." />
+          <ComboboxTrigger />
+        </ComboboxAnchor>
+        <ComboboxContent>
+          <ComboboxSearch placeholder="Search..." />
+          <ComboboxEmpty />
+          <ComboboxList>
+            {(item: Item) => (
+              <ComboboxItem key={item.value} value={item}>
+                {item.label}
+              </ComboboxItem>
+            )}
+          </ComboboxList>
+        </ComboboxContent>
+      </Combobox>
+    </div>
+  ),
+}
+
+export const DropdownWithPreselection: Story = {
+  name: 'Dropdown with preselection',
+  render: () => (
+    <div className="flex items-center gap-2">
+      <span className="text-sm text-muted-foreground">Fruit:</span>
+      <Combobox
+        items={fruits}
+        variant="dropdown"
+        defaultValue={{ label: 'Cherry', value: 'cherry' }}
+      >
+        <ComboboxAnchor>
+          <ComboboxInput placeholder="Select fruit..." />
+          <ComboboxTrigger />
+        </ComboboxAnchor>
+        <ComboboxContent>
+          <ComboboxSearch placeholder="Search..." />
           <ComboboxEmpty />
           <ComboboxList>
             {(item: Item) => (

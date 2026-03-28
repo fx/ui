@@ -1,66 +1,318 @@
 import { Combobox as BaseCombobox } from '@base-ui-components/react/combobox'
-import { Check, ChevronsUpDown } from 'lucide-react'
+import { cva } from 'class-variance-authority'
+import { Check, ChevronDown, ChevronsUpDown, Search } from 'lucide-react'
 import * as React from 'react'
 import { cn } from '@/lib/utils'
 
-// Combobox Root
-function Combobox<Value, Multiple extends boolean | undefined = false>({
-  ...props
-}: React.ComponentPropsWithRef<typeof BaseCombobox.Root<Value, Multiple>>) {
-  return <BaseCombobox.Root data-slot="combobox" {...props} />
+// ---------------------------------------------------------------------------
+// Context — propagates size & variant from Root to all sub-components
+// ---------------------------------------------------------------------------
+
+type ComboboxVariant = 'default' | 'dropdown'
+type ComboboxSize = 'default' | 'xs'
+
+interface ComboboxContextValue {
+  size: ComboboxSize
+  variant: ComboboxVariant
 }
 
+const ComboboxContext = React.createContext<ComboboxContextValue>({
+  size: 'default',
+  variant: 'default',
+})
+
+function useComboboxContext() {
+  return React.useContext(ComboboxContext)
+}
+
+// ---------------------------------------------------------------------------
+// CVA variant definitions
+// ---------------------------------------------------------------------------
+
+const comboboxInputVariants = cva(
+  'placeholder:text-muted-foreground flex w-full min-w-0 bg-transparent outline-none disabled:pointer-events-none disabled:opacity-50',
+  {
+    variants: {
+      size: {
+        default: 'h-9 px-3 py-1 pr-8 text-base md:text-sm',
+        xs: 'h-6 px-2 py-0.5 pr-6 text-xs',
+      },
+    },
+    defaultVariants: {
+      size: 'default',
+    },
+  },
+)
+
+const comboboxTriggerVariants = cva('absolute inset-y-0 right-0 flex items-center cursor-pointer', {
+  variants: {
+    size: {
+      default: 'pr-2',
+      xs: 'pr-1.5',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+  },
+})
+
+const comboboxIconSizeVariants = cva('', {
+  variants: {
+    size: {
+      default: 'size-4',
+      xs: 'size-3',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+  },
+})
+
+const comboboxTriggerIconVariants = cva('opacity-50 shrink-0', {
+  variants: {
+    size: {
+      default: 'size-4',
+      xs: 'size-3',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+  },
+})
+
+const comboboxItemVariants = cva(
+  'relative flex w-full cursor-default items-center gap-2 rounded-sm outline-none select-none data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+  {
+    variants: {
+      size: {
+        default: 'py-1.5 pl-2 pr-8 text-sm',
+        xs: 'py-1 pl-1.5 pr-6 text-xs',
+      },
+    },
+    defaultVariants: {
+      size: 'default',
+    },
+  },
+)
+
+const comboboxItemIndicatorVariants = cva('absolute flex items-center justify-center', {
+  variants: {
+    size: {
+      default: 'right-2',
+      xs: 'right-1.5',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+  },
+})
+
+const comboboxGroupLabelVariants = cva('font-medium text-muted-foreground', {
+  variants: {
+    size: {
+      default: 'px-2 py-1.5 text-xs',
+      xs: 'px-1.5 py-1 text-[0.65rem]',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+  },
+})
+
+const comboboxSearchWrapperVariants = cva('flex items-center gap-2 border-b border-border px-2', {
+  variants: {
+    size: {
+      default: 'py-1.5',
+      xs: 'py-1',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+  },
+})
+
+const comboboxSearchInputVariants = cva(
+  'w-full bg-transparent outline-none placeholder:text-muted-foreground',
+  {
+    variants: {
+      size: {
+        default: 'text-sm h-6',
+        xs: 'text-xs h-5',
+      },
+    },
+    defaultVariants: {
+      size: 'default',
+    },
+  },
+)
+
+const comboboxEmptyVariants = cva('empty:hidden text-center text-muted-foreground', {
+  variants: {
+    size: {
+      default: 'py-6 text-sm',
+      xs: 'py-4 text-xs',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+  },
+})
+
+const comboboxAnchorVariants = cva('relative transition-colors', {
+  variants: {
+    variant: {
+      default: [
+        'border border-input',
+        'focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]',
+        'has-[[data-popup-open]]:border-b-transparent has-[[data-popup-open]]:ring-0',
+        'has-[[data-popup-open]]:border-ring',
+      ],
+      dropdown: [
+        'inline-flex items-center border border-transparent rounded-md',
+        'hover:bg-muted/50 hover:border-border',
+        'focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]',
+        'has-[[data-popup-open]]:bg-muted/50 has-[[data-popup-open]]:border-border has-[[data-popup-open]]:ring-0',
+      ],
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
+})
+
+const comboboxDropdownTriggerVariants = cva(
+  'flex items-center gap-1 cursor-pointer bg-transparent outline-none select-none text-foreground',
+  {
+    variants: {
+      size: {
+        default: 'h-9 px-3 py-1 text-base md:text-sm',
+        xs: 'h-6 px-2 py-0.5 text-xs',
+      },
+    },
+    defaultVariants: {
+      size: 'default',
+    },
+  },
+)
+
+// ---------------------------------------------------------------------------
+// Combobox Root
+// ---------------------------------------------------------------------------
+
+interface ComboboxProps<Value, Multiple extends boolean | undefined = false>
+  extends React.ComponentPropsWithRef<typeof BaseCombobox.Root<Value, Multiple>> {
+  size?: ComboboxSize
+  variant?: ComboboxVariant
+}
+
+function defaultIsItemEqualToValue<Value>(a: Value, b: Value): boolean {
+  if (Object.is(a, b)) return true
+  if (typeof a !== 'object' || typeof b !== 'object' || a === null || b === null) return false
+  return JSON.stringify(a) === JSON.stringify(b)
+}
+
+function Combobox<Value, Multiple extends boolean | undefined = false>({
+  size = 'default',
+  variant = 'default',
+  isItemEqualToValue = defaultIsItemEqualToValue,
+  ...props
+}: ComboboxProps<Value, Multiple>) {
+  const ctx = React.useMemo(() => ({ size, variant }), [size, variant])
+  return (
+    <ComboboxContext.Provider value={ctx}>
+      <BaseCombobox.Root data-slot="combobox" isItemEqualToValue={isItemEqualToValue} {...props} />
+    </ComboboxContext.Provider>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // ComboboxAnchor — container for Input + Trigger, owns the border & focus ring
+// ---------------------------------------------------------------------------
+
 function ComboboxAnchor({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> }) {
+  const { variant } = useComboboxContext()
   return (
     <div
       data-slot="combobox-anchor"
-      className={cn(
-        'relative border border-input transition-colors',
-        'focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]',
-        'has-[[data-popup-open]]:border-b-transparent has-[[data-popup-open]]:ring-0',
-        'has-[[data-popup-open]]:border-ring',
-        className,
-      )}
+      className={cn(comboboxAnchorVariants({ variant }), className)}
       {...props}
     />
   )
 }
 
+// ---------------------------------------------------------------------------
 // ComboboxInput
+// ---------------------------------------------------------------------------
+
 interface ComboboxInputProps extends React.ComponentPropsWithRef<typeof BaseCombobox.Input> {}
 
-function ComboboxInput({ className, ...props }: ComboboxInputProps) {
+function ComboboxInput({ className, placeholder, ...props }: ComboboxInputProps) {
+  const { size, variant } = useComboboxContext()
+
+  if (variant === 'dropdown') {
+    // Forward all props (disabled, ref, event handlers, aria/data attrs) to the trigger.
+    // Input-specific props like `value`/`onChange` are harmless on a button element.
+    const { value: _value, onChange: _onChange, ...triggerProps } = props as Record<string, unknown>
+    return (
+      <BaseCombobox.Trigger
+        data-slot="combobox-input"
+        className={cn(comboboxDropdownTriggerVariants({ size }), className)}
+        {...(triggerProps as React.ComponentPropsWithRef<typeof BaseCombobox.Trigger>)}
+      >
+        <BaseCombobox.Value>
+          {(value: unknown) => {
+            if (value != null) {
+              const label =
+                typeof value === 'object' && value !== null && 'label' in value
+                  ? String((value as { label: unknown }).label)
+                  : String(value)
+              return <span className="truncate">{label}</span>
+            }
+            return (
+              <span className="truncate text-muted-foreground">{placeholder ?? 'Select...'}</span>
+            )
+          }}
+        </BaseCombobox.Value>
+        <ChevronDown className={cn(comboboxTriggerIconVariants({ size }), 'ml-1')} />
+      </BaseCombobox.Trigger>
+    )
+  }
+
   return (
     <BaseCombobox.Input
       data-slot="combobox-input"
-      className={cn(
-        'placeholder:text-muted-foreground flex h-9 w-full min-w-0 bg-transparent px-3 py-1 pr-8 text-base outline-none disabled:pointer-events-none disabled:opacity-50 md:text-sm',
-        className,
-      )}
+      className={cn(comboboxInputVariants({ size }), className)}
+      placeholder={placeholder}
       {...props}
     />
   )
 }
 
-// ComboboxTrigger — dropdown arrow button
+// ---------------------------------------------------------------------------
+// ComboboxTrigger — dropdown arrow button (default variant only)
+// ---------------------------------------------------------------------------
+
 interface ComboboxTriggerProps extends React.ComponentPropsWithRef<typeof BaseCombobox.Trigger> {
   asChild?: boolean
 }
 
 function ComboboxTrigger({ className, asChild, children, ...props }: ComboboxTriggerProps) {
+  const { size, variant } = useComboboxContext()
+
+  // In dropdown variant, the trigger is built into ComboboxInput
+  if (variant === 'dropdown') {
+    return null
+  }
+
   if (asChild) {
     const child = React.Children.only(children) as React.ReactElement<Record<string, unknown>>
     return (
       <BaseCombobox.Trigger
         data-slot="combobox-trigger"
-        className={cn(
-          'absolute inset-y-0 right-0 flex items-center pr-2 cursor-pointer',
-          className,
-        )}
+        className={cn(comboboxTriggerVariants({ size }), className)}
         render={child}
         {...props}
       />
@@ -70,31 +322,63 @@ function ComboboxTrigger({ className, asChild, children, ...props }: ComboboxTri
   return (
     <BaseCombobox.Trigger
       data-slot="combobox-trigger"
-      className={cn('absolute inset-y-0 right-0 flex items-center pr-2 cursor-pointer', className)}
+      className={cn(comboboxTriggerVariants({ size }), className)}
       {...props}
     >
       {children ?? (
         <BaseCombobox.Icon>
-          <ChevronsUpDown className="size-4 opacity-50 shrink-0" />
+          <ChevronsUpDown className={cn(comboboxTriggerIconVariants({ size }))} />
         </BaseCombobox.Icon>
       )}
     </BaseCombobox.Trigger>
   )
 }
 
+// ---------------------------------------------------------------------------
+// ComboboxSearch — search input placed inside the popup for dropdown variant
+// ---------------------------------------------------------------------------
+
+interface ComboboxSearchProps
+  extends Omit<React.ComponentPropsWithRef<typeof BaseCombobox.Input>, 'children'> {}
+
+function ComboboxSearch({ className, ...props }: ComboboxSearchProps) {
+  const { size } = useComboboxContext()
+  return (
+    <div data-slot="combobox-search" className={cn(comboboxSearchWrapperVariants({ size }))}>
+      <Search
+        className={cn('shrink-0 text-muted-foreground', comboboxIconSizeVariants({ size }))}
+      />
+      <BaseCombobox.Input
+        autoFocus
+        {...props}
+        className={cn(comboboxSearchInputVariants({ size }), className)}
+      />
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // ComboboxContent — Portal + Positioner + Popup
+// ---------------------------------------------------------------------------
+
 function ComboboxContent({
   className,
   children,
   ...props
 }: React.ComponentPropsWithRef<typeof BaseCombobox.Popup>) {
+  const { variant } = useComboboxContext()
+
   return (
     <BaseCombobox.Portal className="fixed inset-0 z-[60] pointer-events-none [&>*]:pointer-events-auto">
-      <BaseCombobox.Positioner sideOffset={-1}>
+      <BaseCombobox.Positioner sideOffset={variant === 'dropdown' ? 4 : -1}>
         <BaseCombobox.Popup
           data-slot="combobox-content"
           className={cn(
-            'relative z-[60] max-h-[min(var(--available-height),24rem)] -ml-px w-[calc(var(--anchor-width)+2px)] overflow-y-auto overflow-x-hidden border border-t-0 border-ring bg-popover p-1 text-popover-foreground shadow-md',
+            'relative z-[60] max-h-[min(var(--available-height),24rem)] overflow-y-auto overflow-x-hidden bg-popover p-1 text-popover-foreground shadow-md',
+            variant === 'default' &&
+              '-ml-px w-[calc(var(--anchor-width)+2px)] border border-t-0 border-ring',
+            variant === 'dropdown' &&
+              'w-[max(var(--anchor-width),12rem)] rounded-md border border-border',
             className,
           )}
           {...props}
@@ -106,7 +390,10 @@ function ComboboxContent({
   )
 }
 
+// ---------------------------------------------------------------------------
 // ComboboxList — render function container for items
+// ---------------------------------------------------------------------------
+
 function ComboboxList({
   className,
   ...props
@@ -114,16 +401,20 @@ function ComboboxList({
   return <BaseCombobox.List data-slot="combobox-list" className={cn(className)} {...props} />
 }
 
+// ---------------------------------------------------------------------------
 // ComboboxEmpty
+// ---------------------------------------------------------------------------
+
 function ComboboxEmpty({
   className,
   children,
   ...props
 }: React.ComponentPropsWithRef<typeof BaseCombobox.Empty>) {
+  const { size } = useComboboxContext()
   return (
     <BaseCombobox.Empty
       data-slot="combobox-empty"
-      className={cn('empty:hidden py-6 text-center text-sm text-muted-foreground', className)}
+      className={cn(comboboxEmptyVariants({ size }), className)}
       {...props}
     >
       {children ?? 'No results found.'}
@@ -131,28 +422,32 @@ function ComboboxEmpty({
   )
 }
 
+// ---------------------------------------------------------------------------
 // ComboboxItem
+// ---------------------------------------------------------------------------
+
 interface ComboboxItemProps extends React.ComponentPropsWithRef<typeof BaseCombobox.Item> {}
 
 function ComboboxItem({ className, children, ...props }: ComboboxItemProps) {
+  const { size } = useComboboxContext()
   return (
     <BaseCombobox.Item
       data-slot="combobox-item"
-      className={cn(
-        'relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none select-none data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-        className,
-      )}
+      className={cn(comboboxItemVariants({ size }), className)}
       {...props}
     >
-      <BaseCombobox.ItemIndicator className="absolute right-2 flex items-center justify-center">
-        <Check className="size-4" />
+      <BaseCombobox.ItemIndicator className={cn(comboboxItemIndicatorVariants({ size }))}>
+        <Check className={comboboxIconSizeVariants({ size })} />
       </BaseCombobox.ItemIndicator>
       {children}
     </BaseCombobox.Item>
   )
 }
 
+// ---------------------------------------------------------------------------
 // ComboboxGroup
+// ---------------------------------------------------------------------------
+
 function ComboboxGroup({
   className,
   ...props
@@ -162,21 +457,28 @@ function ComboboxGroup({
   )
 }
 
+// ---------------------------------------------------------------------------
 // ComboboxLabel
+// ---------------------------------------------------------------------------
+
 function ComboboxLabel({
   className,
   ...props
 }: React.ComponentPropsWithRef<typeof BaseCombobox.GroupLabel>) {
+  const { size } = useComboboxContext()
   return (
     <BaseCombobox.GroupLabel
       data-slot="combobox-label"
-      className={cn('px-2 py-1.5 text-xs font-medium text-muted-foreground', className)}
+      className={cn(comboboxGroupLabelVariants({ size }), className)}
       {...props}
     />
   )
 }
 
+// ---------------------------------------------------------------------------
 // ComboboxSeparator
+// ---------------------------------------------------------------------------
+
 function ComboboxSeparator({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
@@ -187,17 +489,38 @@ function ComboboxSeparator({ className, ...props }: React.HTMLAttributes<HTMLDiv
   )
 }
 
+// ---------------------------------------------------------------------------
+// Exports
+// ---------------------------------------------------------------------------
+
 export {
   Combobox,
   ComboboxAnchor,
+  comboboxAnchorVariants,
   ComboboxContent,
+  comboboxDropdownTriggerVariants,
   ComboboxEmpty,
   ComboboxGroup,
+  comboboxGroupLabelVariants,
   ComboboxInput,
+  comboboxInputVariants,
   ComboboxItem,
+  comboboxItemVariants,
   ComboboxLabel,
   ComboboxList,
+  ComboboxSearch,
   ComboboxSeparator,
   ComboboxTrigger,
+  comboboxTriggerVariants,
+  useComboboxContext,
 }
-export type { ComboboxInputProps, ComboboxItemProps, ComboboxTriggerProps }
+export type {
+  ComboboxContextValue,
+  ComboboxInputProps,
+  ComboboxItemProps,
+  ComboboxProps,
+  ComboboxSearchProps,
+  ComboboxSize,
+  ComboboxTriggerProps,
+  ComboboxVariant,
+}
