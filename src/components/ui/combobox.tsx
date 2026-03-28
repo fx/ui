@@ -241,14 +241,23 @@ function ComboboxAnchor({
 
 interface ComboboxInputProps extends React.ComponentPropsWithRef<typeof BaseCombobox.Input> {}
 
-function ComboboxInput({ className, placeholder, ...props }: ComboboxInputProps) {
+function ComboboxInput({ className, placeholder, disabled, ...props }: ComboboxInputProps) {
   const { size, variant } = useComboboxContext()
 
   if (variant === 'dropdown') {
+    // Extract data-* and aria-* attributes to forward to the trigger
+    const forwardedProps: Record<string, unknown> = {}
+    for (const key of Object.keys(props)) {
+      if (key.startsWith('data-') || key.startsWith('aria-')) {
+        forwardedProps[key] = (props as Record<string, unknown>)[key]
+      }
+    }
     return (
       <BaseCombobox.Trigger
         data-slot="combobox-input"
         className={cn(comboboxDropdownTriggerVariants({ size }), className)}
+        disabled={disabled}
+        {...forwardedProps}
       >
         <BaseCombobox.Value>
           {(value: unknown) => {
@@ -274,6 +283,7 @@ function ComboboxInput({ className, placeholder, ...props }: ComboboxInputProps)
       data-slot="combobox-input"
       className={cn(comboboxInputVariants({ size }), className)}
       placeholder={placeholder}
+      disabled={disabled}
       {...props}
     />
   )
@@ -337,9 +347,9 @@ function ComboboxSearch({ className, ...props }: ComboboxSearchProps) {
         className={cn('shrink-0 text-muted-foreground', comboboxIconSizeVariants({ size }))}
       />
       <BaseCombobox.Input
-        className={cn(comboboxSearchInputVariants({ size }), className)}
         autoFocus
         {...props}
+        className={cn(comboboxSearchInputVariants({ size }), className)}
       />
     </div>
   )
