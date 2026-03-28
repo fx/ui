@@ -30,7 +30,7 @@ function useComboboxContext() {
 // ---------------------------------------------------------------------------
 
 const comboboxInputVariants = cva(
-  'placeholder:text-muted-foreground flex flex-1 min-w-0 min-w-[4rem] bg-transparent outline-none disabled:pointer-events-none disabled:opacity-50',
+  'placeholder:text-muted-foreground flex flex-1 min-w-[4rem] bg-transparent outline-none disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       size: {
@@ -162,7 +162,7 @@ const comboboxAnchorVariants = cva('relative transition-colors', {
   variants: {
     variant: {
       default: [
-        'flex flex-wrap items-center gap-1 p-1',
+        'flex flex-wrap items-center gap-1',
         'border border-input',
         'focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]',
         'has-[[data-popup-open]]:border-b-transparent has-[[data-popup-open]]:ring-0',
@@ -204,6 +204,13 @@ interface ComboboxProps<Value, Multiple extends boolean | undefined = false>
   extends React.ComponentPropsWithRef<typeof BaseCombobox.Root<Value, Multiple>> {
   size?: ComboboxSize
   variant?: ComboboxVariant
+}
+
+/** Extract a display label from a value — handles both objects with `label` and primitives. */
+function extractLabel(v: unknown): string {
+  return typeof v === 'object' && v !== null && 'label' in v
+    ? String((v as { label: unknown }).label)
+    : String(v)
 }
 
 function defaultIsItemEqualToValue<Value>(a: Value, b: Value): boolean {
@@ -267,23 +274,14 @@ function ComboboxInput({ className, placeholder, ...props }: ComboboxInputProps)
           {(value: unknown) => {
             if (Array.isArray(value)) {
               if (value.length > 0) {
-                const labels = value.map((v: unknown) =>
-                  typeof v === 'object' && v !== null && 'label' in v
-                    ? String((v as { label: unknown }).label)
-                    : String(v),
-                )
-                return <span className="truncate">{labels.join(', ')}</span>
+                return <span className="truncate">{value.map(extractLabel).join(', ')}</span>
               }
               return (
                 <span className="truncate text-muted-foreground">{placeholder ?? 'Select...'}</span>
               )
             }
             if (value != null) {
-              const label =
-                typeof value === 'object' && value !== null && 'label' in value
-                  ? String((value as { label: unknown }).label)
-                  : String(value)
-              return <span className="truncate">{label}</span>
+              return <span className="truncate">{extractLabel(value)}</span>
             }
             return (
               <span className="truncate text-muted-foreground">{placeholder ?? 'Select...'}</span>
@@ -507,17 +505,7 @@ function ComboboxSeparator({ className, ...props }: React.HTMLAttributes<HTMLDiv
 // ComboboxChips — container for multi-select chips (render function pattern)
 // ---------------------------------------------------------------------------
 
-const comboboxChipsVariants = cva('flex flex-wrap items-center gap-1', {
-  variants: {
-    size: {
-      default: '',
-      xs: '',
-    },
-  },
-  defaultVariants: {
-    size: 'default',
-  },
-})
+const comboboxChipsVariants = cva('flex flex-wrap items-center gap-1')
 
 interface ComboboxChipsProps
   extends Omit<React.ComponentPropsWithRef<typeof BaseCombobox.Chips>, 'children'> {
@@ -525,14 +513,12 @@ interface ComboboxChipsProps
 }
 
 function ComboboxChips({ className, children, ...props }: ComboboxChipsProps) {
-  const { size } = useComboboxContext()
-
   if (typeof children === 'function') {
     const renderFn = children
     return (
       <BaseCombobox.Chips
         data-slot="combobox-chips"
-        className={cn(comboboxChipsVariants({ size }), className)}
+        className={cn(comboboxChipsVariants(), className)}
         {...props}
       >
         <BaseCombobox.Value>
@@ -550,7 +536,7 @@ function ComboboxChips({ className, children, ...props }: ComboboxChipsProps) {
   return (
     <BaseCombobox.Chips
       data-slot="combobox-chips"
-      className={cn(comboboxChipsVariants({ size }), className)}
+      className={cn(comboboxChipsVariants(), className)}
       {...props}
     >
       {children}
@@ -600,17 +586,6 @@ function ComboboxChip({
 
 const comboboxChipRemoveVariants = cva(
   'inline-flex items-center justify-center shrink-0 cursor-pointer opacity-70 hover:opacity-100',
-  {
-    variants: {
-      size: {
-        default: '',
-        xs: '',
-      },
-    },
-    defaultVariants: {
-      size: 'default',
-    },
-  },
 )
 
 function ComboboxChipRemove({
@@ -622,10 +597,10 @@ function ComboboxChipRemove({
   return (
     <BaseCombobox.ChipRemove
       data-slot="combobox-chip-remove"
-      className={cn(comboboxChipRemoveVariants({ size }), className)}
+      className={cn(comboboxChipRemoveVariants(), className)}
       {...props}
     >
-      {children ?? <X className="size-3" />}
+      {children ?? <X className={comboboxIconSizeVariants({ size })} />}
     </BaseCombobox.ChipRemove>
   )
 }
