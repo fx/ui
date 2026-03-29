@@ -193,7 +193,7 @@ const comboboxAnchorVariants = cva('relative transition-colors', {
 })
 
 const comboboxDropdownTriggerVariants = cva(
-  'flex items-center gap-1 cursor-pointer bg-transparent outline-none select-none text-foreground',
+  'flex items-center gap-1 min-w-0 cursor-pointer bg-transparent outline-none select-none text-foreground',
   {
     variants: {
       size: {

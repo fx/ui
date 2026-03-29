@@ -370,6 +370,85 @@ export const MultiSelect: Story = {
           </Combobox>
         </div>
       </div>
+
+      <div>
+        <p className="mb-2 text-sm font-medium text-muted-foreground">
+          Default variant with max-width constraint
+        </p>
+        <div className="max-w-48">
+          <Combobox
+            items={fruits}
+            multiple
+            defaultValue={[
+              { label: 'Apple', value: 'apple' },
+              { label: 'Blueberry', value: 'blueberry' },
+              { label: 'Cherry', value: 'cherry' },
+            ]}
+          >
+            <ComboboxAnchor>
+              <ComboboxChips>
+                {(value: unknown) => {
+                  const item = value as Item
+                  return (
+                    <ComboboxChip key={item.value}>
+                      {item.label}
+                      <ComboboxChipRemove />
+                    </ComboboxChip>
+                  )
+                }}
+              </ComboboxChips>
+              <ComboboxInput placeholder="Search fruits..." />
+              <ComboboxTrigger />
+            </ComboboxAnchor>
+            <ComboboxContent>
+              <ComboboxEmpty />
+              <ComboboxList>
+                {(item: Item) => (
+                  <ComboboxItem key={item.value} value={item}>
+                    {item.label}
+                  </ComboboxItem>
+                )}
+              </ComboboxList>
+            </ComboboxContent>
+          </Combobox>
+        </div>
+      </div>
+
+      <div>
+        <p className="mb-2 text-sm font-medium text-muted-foreground">
+          Dropdown variant with max-width constraint (ellipsis)
+        </p>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">Fruits:</span>
+          <Combobox
+            items={fruits}
+            variant="dropdown"
+            multiple
+            defaultValue={[
+              { label: 'Apple', value: 'apple' },
+              { label: 'Blueberry', value: 'blueberry' },
+              { label: 'Cherry', value: 'cherry' },
+              { label: 'Grape', value: 'grape' },
+            ]}
+          >
+            <ComboboxAnchor className="max-w-40">
+              <ComboboxInput placeholder="Select fruits..." />
+              <ComboboxTrigger />
+            </ComboboxAnchor>
+            <ComboboxContent>
+              <ComboboxSearch placeholder="Search..." />
+              <ComboboxEmpty />
+              <ComboboxList>
+                {(item: Item) => (
+                  <ComboboxItem key={item.value} value={item}>
+                    {item.label}
+                  </ComboboxItem>
+                )}
+              </ComboboxList>
+            </ComboboxContent>
+          </Combobox>
+        </div>
+      </div>
     </div>
   ),
 }
