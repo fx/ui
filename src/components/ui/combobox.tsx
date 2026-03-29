@@ -396,6 +396,7 @@ function ComboboxContent({
       <BaseCombobox.Positioner
         sideOffset={variant === 'dropdown' ? 4 : -1}
         anchor={variant === 'default' ? anchorRef : undefined}
+        align={variant === 'dropdown' ? 'start' : undefined}
       >
         <BaseCombobox.Popup
           data-slot="combobox-content"
