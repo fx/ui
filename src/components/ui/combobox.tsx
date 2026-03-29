@@ -1,6 +1,6 @@
 import { Combobox as BaseCombobox } from '@base-ui-components/react/combobox'
 import { cva } from 'class-variance-authority'
-import { Check, ChevronDown, ChevronsUpDown, Search } from 'lucide-react'
+import { Check, ChevronDown, ChevronsUpDown, Search, X } from 'lucide-react'
 import * as React from 'react'
 import { cn } from '@/lib/utils'
 
@@ -14,11 +14,13 @@ type ComboboxSize = 'default' | 'xs'
 interface ComboboxContextValue {
   size: ComboboxSize
   variant: ComboboxVariant
+  anchorRef: React.MutableRefObject<HTMLDivElement | null>
 }
 
 const ComboboxContext = React.createContext<ComboboxContextValue>({
   size: 'default',
   variant: 'default',
+  anchorRef: { current: null },
 })
 
 function useComboboxContext() {
@@ -30,12 +32,12 @@ function useComboboxContext() {
 // ---------------------------------------------------------------------------
 
 const comboboxInputVariants = cva(
-  'placeholder:text-muted-foreground flex w-full min-w-0 bg-transparent outline-none disabled:pointer-events-none disabled:opacity-50',
+  'placeholder:text-muted-foreground flex flex-1 min-w-[4rem] bg-transparent outline-none disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       size: {
-        default: 'h-9 px-3 py-1 pr-8 text-base md:text-sm',
-        xs: 'h-6 px-2 py-0.5 pr-6 text-xs',
+        default: 'h-7 px-2 pr-7 text-base md:text-sm',
+        xs: 'h-5 px-1 pr-5 text-xs',
       },
     },
     defaultVariants: {
@@ -162,6 +164,7 @@ const comboboxAnchorVariants = cva('relative transition-colors', {
   variants: {
     variant: {
       default: [
+        'flex flex-wrap items-center',
         'border border-input',
         'focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]',
         'has-[[data-popup-open]]:border-b-transparent has-[[data-popup-open]]:ring-0',
@@ -174,14 +177,23 @@ const comboboxAnchorVariants = cva('relative transition-colors', {
         'has-[[data-popup-open]]:bg-muted/50 has-[[data-popup-open]]:border-border has-[[data-popup-open]]:ring-0',
       ],
     },
+    size: {
+      default: '',
+      xs: '',
+    },
   },
+  compoundVariants: [
+    { variant: 'default', size: 'default', class: 'min-h-9 gap-1 p-1' },
+    { variant: 'default', size: 'xs', class: 'min-h-6 gap-0.5 p-0.5' },
+  ],
   defaultVariants: {
     variant: 'default',
+    size: 'default',
   },
 })
 
 const comboboxDropdownTriggerVariants = cva(
-  'flex items-center gap-1 cursor-pointer bg-transparent outline-none select-none text-foreground',
+  'flex items-center gap-1 min-w-0 cursor-pointer bg-transparent outline-none select-none text-foreground',
   {
     variants: {
       size: {
@@ -205,6 +217,13 @@ interface ComboboxProps<Value, Multiple extends boolean | undefined = false>
   variant?: ComboboxVariant
 }
 
+/** Extract a display label from a value — handles both objects with `label` and primitives. */
+function extractLabel(v: unknown): string {
+  return typeof v === 'object' && v !== null && 'label' in v
+    ? String((v as { label: unknown }).label)
+    : String(v)
+}
+
 function defaultIsItemEqualToValue<Value>(a: Value, b: Value): boolean {
   if (Object.is(a, b)) return true
   if (typeof a !== 'object' || typeof b !== 'object' || a === null || b === null) return false
@@ -217,7 +236,8 @@ function Combobox<Value, Multiple extends boolean | undefined = false>({
   isItemEqualToValue = defaultIsItemEqualToValue,
   ...props
 }: ComboboxProps<Value, Multiple>) {
-  const ctx = React.useMemo(() => ({ size, variant }), [size, variant])
+  const anchorRef = React.useRef<HTMLDivElement>(null)
+  const ctx = React.useMemo(() => ({ size, variant, anchorRef }), [size, variant])
   return (
     <ComboboxContext.Provider value={ctx}>
       <BaseCombobox.Root data-slot="combobox" isItemEqualToValue={isItemEqualToValue} {...props} />
@@ -231,13 +251,21 @@ function Combobox<Value, Multiple extends boolean | undefined = false>({
 
 function ComboboxAnchor({
   className,
+  ref,
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> }) {
-  const { variant } = useComboboxContext()
+  const { variant, size, anchorRef } = useComboboxContext()
   return (
     <div
+      ref={(node) => {
+        // Set context ref for positioner anchor tracking
+        anchorRef.current = node
+        // Forward consumer ref
+        if (typeof ref === 'function') ref(node)
+        else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node
+      }}
       data-slot="combobox-anchor"
-      className={cn(comboboxAnchorVariants({ variant }), className)}
+      className={cn(comboboxAnchorVariants({ variant, size }), className)}
       {...props}
     />
   )
@@ -253,8 +281,8 @@ function ComboboxInput({ className, placeholder, ...props }: ComboboxInputProps)
   const { size, variant } = useComboboxContext()
 
   if (variant === 'dropdown') {
-    // Forward all props (disabled, ref, event handlers, aria/data attrs) to the trigger.
-    // Input-specific props like `value`/`onChange` are harmless on a button element.
+    // Forward most props to the trigger, stripping Input-specific `value`/`onChange`
+    // which don't apply to a button element.
     const { value: _value, onChange: _onChange, ...triggerProps } = props as Record<string, unknown>
     return (
       <BaseCombobox.Trigger
@@ -264,12 +292,16 @@ function ComboboxInput({ className, placeholder, ...props }: ComboboxInputProps)
       >
         <BaseCombobox.Value>
           {(value: unknown) => {
+            if (Array.isArray(value)) {
+              if (value.length > 0) {
+                return <span className="truncate">{value.map(extractLabel).join(', ')}</span>
+              }
+              return (
+                <span className="truncate text-muted-foreground">{placeholder ?? 'Select...'}</span>
+              )
+            }
             if (value != null) {
-              const label =
-                typeof value === 'object' && value !== null && 'label' in value
-                  ? String((value as { label: unknown }).label)
-                  : String(value)
-              return <span className="truncate">{label}</span>
+              return <span className="truncate">{extractLabel(value)}</span>
             }
             return (
               <span className="truncate text-muted-foreground">{placeholder ?? 'Select...'}</span>
@@ -366,19 +398,21 @@ function ComboboxContent({
   children,
   ...props
 }: React.ComponentPropsWithRef<typeof BaseCombobox.Popup>) {
-  const { variant } = useComboboxContext()
+  const { variant, anchorRef } = useComboboxContext()
 
   return (
     <BaseCombobox.Portal className="fixed inset-0 z-[60] pointer-events-none [&>*]:pointer-events-auto">
-      <BaseCombobox.Positioner sideOffset={variant === 'dropdown' ? 4 : -1}>
+      <BaseCombobox.Positioner
+        sideOffset={variant === 'dropdown' ? 4 : -1}
+        anchor={variant === 'default' ? anchorRef : undefined}
+        align={variant === 'dropdown' ? 'start' : undefined}
+      >
         <BaseCombobox.Popup
           data-slot="combobox-content"
           className={cn(
             'relative z-[60] max-h-[min(var(--available-height),24rem)] overflow-y-auto overflow-x-hidden bg-popover p-1 text-popover-foreground shadow-md',
-            variant === 'default' &&
-              '-ml-px w-[calc(var(--anchor-width)+2px)] border border-t-0 border-ring',
-            variant === 'dropdown' &&
-              'w-[max(var(--anchor-width),12rem)] rounded-md border border-border',
+            variant === 'default' && 'w-[var(--anchor-width)] border border-t-0 border-ring',
+            variant === 'dropdown' && 'min-w-[12rem] max-w-[20rem] rounded-md border border-border',
             className,
           )}
           {...props}
@@ -490,6 +524,112 @@ function ComboboxSeparator({ className, ...props }: React.HTMLAttributes<HTMLDiv
 }
 
 // ---------------------------------------------------------------------------
+// ComboboxChips — container for multi-select chips (render function pattern)
+// ---------------------------------------------------------------------------
+
+const comboboxChipsVariants = cva('flex flex-wrap items-center gap-1')
+
+interface ComboboxChipsProps
+  extends Omit<React.ComponentPropsWithRef<typeof BaseCombobox.Chips>, 'children'> {
+  children?: React.ReactNode | ((value: unknown, index: number) => React.ReactNode)
+}
+
+function ComboboxChips({ className, children, ...props }: ComboboxChipsProps) {
+  if (typeof children === 'function') {
+    const renderFn = children
+    return (
+      <BaseCombobox.Chips
+        data-slot="combobox-chips"
+        className={cn(comboboxChipsVariants(), className)}
+        {...props}
+      >
+        <BaseCombobox.Value>
+          {(value: unknown) => {
+            if (Array.isArray(value)) {
+              return value.map((v: unknown, i: number) => renderFn(v, i))
+            }
+            return null
+          }}
+        </BaseCombobox.Value>
+      </BaseCombobox.Chips>
+    )
+  }
+
+  return (
+    <BaseCombobox.Chips
+      data-slot="combobox-chips"
+      className={cn(comboboxChipsVariants(), className)}
+      {...props}
+    >
+      {children}
+    </BaseCombobox.Chips>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// ComboboxChip — individual chip for a selected value
+// ---------------------------------------------------------------------------
+
+const comboboxChipVariants = cva(
+  'inline-flex items-center gap-1 rounded border border-border bg-muted text-foreground',
+  {
+    variants: {
+      size: {
+        default: 'text-xs h-6 px-2',
+        xs: 'text-[0.65rem] h-5 px-1.5',
+      },
+    },
+    defaultVariants: {
+      size: 'default',
+    },
+  },
+)
+
+function ComboboxChip({
+  className,
+  children,
+  ...props
+}: React.ComponentPropsWithRef<typeof BaseCombobox.Chip>) {
+  const { size } = useComboboxContext()
+  return (
+    <BaseCombobox.Chip
+      data-slot="combobox-chip"
+      className={cn(comboboxChipVariants({ size }), className)}
+      {...props}
+    >
+      {children}
+    </BaseCombobox.Chip>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// ComboboxChipRemove — remove button inside a chip
+// ---------------------------------------------------------------------------
+
+const comboboxChipRemoveVariants = cva(
+  'inline-flex items-center justify-center shrink-0 cursor-pointer rounded-sm opacity-70 hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+)
+
+function ComboboxChipRemove({
+  className,
+  children,
+  ...props
+}: React.ComponentPropsWithRef<typeof BaseCombobox.ChipRemove>) {
+  const { size } = useComboboxContext()
+  const hasChildren = children != null
+  return (
+    <BaseCombobox.ChipRemove
+      data-slot="combobox-chip-remove"
+      className={cn(comboboxChipRemoveVariants(), className)}
+      {...(!hasChildren && !('aria-label' in props) ? { 'aria-label': 'Remove' } : {})}
+      {...props}
+    >
+      {children ?? <X className={comboboxIconSizeVariants({ size })} />}
+    </BaseCombobox.ChipRemove>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // Exports
 // ---------------------------------------------------------------------------
 
@@ -497,6 +637,12 @@ export {
   Combobox,
   ComboboxAnchor,
   comboboxAnchorVariants,
+  ComboboxChip,
+  comboboxChipRemoveVariants,
+  ComboboxChipRemove,
+  comboboxChipVariants,
+  ComboboxChips,
+  comboboxChipsVariants,
   ComboboxContent,
   comboboxDropdownTriggerVariants,
   ComboboxEmpty,
@@ -515,6 +661,7 @@ export {
   useComboboxContext,
 }
 export type {
+  ComboboxChipsProps,
   ComboboxContextValue,
   ComboboxInputProps,
   ComboboxItemProps,

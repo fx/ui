@@ -1,9 +1,13 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { createRef } from 'react'
 import { describe, expect, it } from 'vitest'
 import {
   Combobox,
   ComboboxAnchor,
+  ComboboxChip,
+  ComboboxChipRemove,
+  ComboboxChips,
   ComboboxContent,
   ComboboxEmpty,
   ComboboxGroup,
@@ -274,7 +278,7 @@ describe('Combobox', () => {
       )
       const input = screen.getByRole('combobox')
       expect(input).toBeInTheDocument()
-      expect(input.className).toContain('h-6')
+      expect(input.className).toContain('h-5')
       expect(input.className).toContain('text-xs')
     })
 
@@ -341,7 +345,7 @@ describe('Combobox', () => {
       )
       const input = screen.getByRole('combobox')
       expect(input.className).toContain('custom-xs')
-      expect(input.className).toContain('h-6')
+      expect(input.className).toContain('h-5')
     })
   })
 
@@ -587,7 +591,7 @@ describe('Combobox', () => {
           <Consumer />
         </Combobox>,
       )
-      expect(ctxValue).toEqual({ size: 'default', variant: 'default' })
+      expect(ctxValue).toMatchObject({ size: 'default', variant: 'default' })
     })
 
     it('provides xs size', () => {
@@ -601,7 +605,7 @@ describe('Combobox', () => {
           <Consumer />
         </Combobox>,
       )
-      expect(ctxValue).toEqual({ size: 'xs', variant: 'default' })
+      expect(ctxValue).toMatchObject({ size: 'xs', variant: 'default' })
     })
 
     it('provides dropdown variant', () => {
@@ -615,7 +619,7 @@ describe('Combobox', () => {
           <Consumer />
         </Combobox>,
       )
-      expect(ctxValue).toEqual({ size: 'default', variant: 'dropdown' })
+      expect(ctxValue).toMatchObject({ size: 'default', variant: 'dropdown' })
     })
 
     it('provides dropdown variant with xs size', () => {
@@ -629,7 +633,7 @@ describe('Combobox', () => {
           <Consumer />
         </Combobox>,
       )
-      expect(ctxValue).toEqual({ size: 'xs', variant: 'dropdown' })
+      expect(ctxValue).toMatchObject({ size: 'xs', variant: 'dropdown' })
     })
   })
 
@@ -702,6 +706,216 @@ describe('Combobox', () => {
         </Combobox>,
       )
       expect(screen.getByTestId('trigger')).toBeInTheDocument()
+    })
+  })
+
+  // ---------------------------------------------------------------------------
+  // Multi-select
+  // ---------------------------------------------------------------------------
+
+  describe('multi-select', () => {
+    it('renders chips for multiple selected values', () => {
+      render(
+        <Combobox
+          items={fruits}
+          multiple
+          defaultValue={[
+            { label: 'Apple', value: 'apple' },
+            { label: 'Cherry', value: 'cherry' },
+          ]}
+        >
+          <ComboboxAnchor>
+            <ComboboxChips>
+              {(value: unknown) => {
+                const item = value as Fruit
+                return (
+                  <ComboboxChip key={item.value}>
+                    {item.label}
+                    <ComboboxChipRemove />
+                  </ComboboxChip>
+                )
+              }}
+            </ComboboxChips>
+            <ComboboxInput placeholder="Search fruits..." />
+            <ComboboxTrigger />
+          </ComboboxAnchor>
+          <ComboboxContent>
+            <ComboboxEmpty />
+            <ComboboxList>
+              {(item: Fruit) => (
+                <ComboboxItem key={item.value} value={item}>
+                  {item.label}
+                </ComboboxItem>
+              )}
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>,
+      )
+      const chips = document.querySelectorAll('[data-slot="combobox-chip"]')
+      expect(chips.length).toBe(2)
+      expect(chips[0]?.textContent).toContain('Apple')
+      expect(chips[1]?.textContent).toContain('Cherry')
+    })
+
+    it('renders comma-separated values in dropdown multi-select', () => {
+      render(
+        <Combobox
+          items={fruits}
+          variant="dropdown"
+          multiple
+          defaultValue={[
+            { label: 'Apple', value: 'apple' },
+            { label: 'Cherry', value: 'cherry' },
+          ]}
+          defaultOpen
+        >
+          <ComboboxAnchor>
+            <ComboboxInput placeholder="Select fruits..." />
+            <ComboboxTrigger />
+          </ComboboxAnchor>
+          <ComboboxContent>
+            <ComboboxSearch placeholder="Search..." />
+            <ComboboxEmpty />
+            <ComboboxList>
+              {(item: Fruit) => (
+                <ComboboxItem key={item.value} value={item}>
+                  {item.label}
+                </ComboboxItem>
+              )}
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>,
+      )
+      expect(screen.getByText('Apple, Cherry')).toBeInTheDocument()
+    })
+
+    it('renders chip remove buttons', () => {
+      render(
+        <Combobox
+          items={fruits}
+          multiple
+          defaultValue={[
+            { label: 'Apple', value: 'apple' },
+            { label: 'Cherry', value: 'cherry' },
+          ]}
+        >
+          <ComboboxAnchor>
+            <ComboboxChips>
+              {(value: unknown) => {
+                const item = value as Fruit
+                return (
+                  <ComboboxChip key={item.value}>
+                    {item.label}
+                    <ComboboxChipRemove />
+                  </ComboboxChip>
+                )
+              }}
+            </ComboboxChips>
+            <ComboboxInput placeholder="Search fruits..." />
+            <ComboboxTrigger />
+          </ComboboxAnchor>
+          <ComboboxContent>
+            <ComboboxEmpty />
+            <ComboboxList>
+              {(item: Fruit) => (
+                <ComboboxItem key={item.value} value={item}>
+                  {item.label}
+                </ComboboxItem>
+              )}
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>,
+      )
+      const removeButtons = document.querySelectorAll('[data-slot="combobox-chip-remove"]')
+      expect(removeButtons.length).toBe(2)
+      // Each remove button should contain an X icon (rendered as SVG)
+      for (const btn of removeButtons) {
+        expect(btn.querySelector('svg')).toBeInTheDocument()
+      }
+    })
+
+    it('has data-slot on ComboboxChips container', () => {
+      render(
+        <Combobox items={fruits} multiple defaultValue={[{ label: 'Apple', value: 'apple' }]}>
+          <ComboboxAnchor>
+            <ComboboxChips>
+              {(value: unknown) => {
+                const item = value as Fruit
+                return (
+                  <ComboboxChip key={item.value}>
+                    {item.label}
+                    <ComboboxChipRemove />
+                  </ComboboxChip>
+                )
+              }}
+            </ComboboxChips>
+            <ComboboxInput placeholder="Search fruits..." />
+            <ComboboxTrigger />
+          </ComboboxAnchor>
+          <ComboboxContent>
+            <ComboboxEmpty />
+            <ComboboxList>
+              {(item: Fruit) => (
+                <ComboboxItem key={item.value} value={item}>
+                  {item.label}
+                </ComboboxItem>
+              )}
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>,
+      )
+      expect(getBySlot('combobox-chips')).toBeInTheDocument()
+    })
+
+    it('removes a chip when clicking the remove button', async () => {
+      const user = userEvent.setup()
+      render(
+        <Combobox
+          items={fruits}
+          multiple
+          defaultValue={[
+            { label: 'Apple', value: 'apple' },
+            { label: 'Cherry', value: 'cherry' },
+          ]}
+        >
+          <ComboboxAnchor>
+            <ComboboxChips>
+              {(value: unknown) => {
+                const item = value as Fruit
+                return (
+                  <ComboboxChip key={item.value}>
+                    {item.label}
+                    <ComboboxChipRemove />
+                  </ComboboxChip>
+                )
+              }}
+            </ComboboxChips>
+            <ComboboxInput placeholder="Search fruits..." />
+            <ComboboxTrigger />
+          </ComboboxAnchor>
+          <ComboboxContent>
+            <ComboboxEmpty />
+            <ComboboxList>
+              {(item: Fruit) => (
+                <ComboboxItem key={item.value} value={item}>
+                  {item.label}
+                </ComboboxItem>
+              )}
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>,
+      )
+      // Should start with 2 chips
+      expect(document.querySelectorAll('[data-slot="combobox-chip"]').length).toBe(2)
+
+      // Click the first remove button
+      const removeButtons = document.querySelectorAll('[data-slot="combobox-chip-remove"]')
+      await user.click(removeButtons[0]!)
+
+      // Should have 1 chip remaining
+      await waitFor(() => {
+        expect(document.querySelectorAll('[data-slot="combobox-chip"]').length).toBe(1)
+      })
     })
   })
 })
