@@ -14,7 +14,7 @@ type ComboboxSize = 'default' | 'xs'
 interface ComboboxContextValue {
   size: ComboboxSize
   variant: ComboboxVariant
-  anchorRef: React.RefObject<HTMLDivElement | null>
+  anchorRef: React.MutableRefObject<HTMLDivElement | null>
 }
 
 const ComboboxContext = React.createContext<ComboboxContextValue>({
@@ -259,7 +259,7 @@ function ComboboxAnchor({
     <div
       ref={(node) => {
         // Set context ref for positioner anchor tracking
-        ;(anchorRef as React.MutableRefObject<HTMLDivElement | null>).current = node
+        anchorRef.current = node
         // Forward consumer ref
         if (typeof ref === 'function') ref(node)
         else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node
@@ -281,8 +281,8 @@ function ComboboxInput({ className, placeholder, ...props }: ComboboxInputProps)
   const { size, variant } = useComboboxContext()
 
   if (variant === 'dropdown') {
-    // Forward all props (disabled, ref, event handlers, aria/data attrs) to the trigger.
-    // Input-specific props like `value`/`onChange` are harmless on a button element.
+    // Forward most props to the trigger, stripping Input-specific `value`/`onChange`
+    // which don't apply to a button element.
     const { value: _value, onChange: _onChange, ...triggerProps } = props as Record<string, unknown>
     return (
       <BaseCombobox.Trigger
