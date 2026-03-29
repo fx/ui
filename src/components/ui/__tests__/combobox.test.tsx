@@ -278,7 +278,7 @@ describe('Combobox', () => {
       )
       const input = screen.getByRole('combobox')
       expect(input).toBeInTheDocument()
-      expect(input.className).toContain('h-6')
+      expect(input.className).toContain('h-5')
       expect(input.className).toContain('text-xs')
     })
 
@@ -345,7 +345,7 @@ describe('Combobox', () => {
       )
       const input = screen.getByRole('combobox')
       expect(input.className).toContain('custom-xs')
-      expect(input.className).toContain('h-6')
+      expect(input.className).toContain('h-5')
     })
   })
 

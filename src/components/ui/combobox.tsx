@@ -36,8 +36,8 @@ const comboboxInputVariants = cva(
   {
     variants: {
       size: {
-        default: 'h-9 px-3 py-1 pr-8 text-base md:text-sm',
-        xs: 'h-6 px-2 py-0.5 pr-6 text-xs',
+        default: 'h-7 px-2 pr-7 text-base md:text-sm',
+        xs: 'h-5 px-1 pr-5 text-xs',
       },
     },
     defaultVariants: {
@@ -164,7 +164,7 @@ const comboboxAnchorVariants = cva('relative transition-colors', {
   variants: {
     variant: {
       default: [
-        'flex flex-wrap items-center gap-1',
+        'flex flex-wrap items-center',
         'border border-input',
         'focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]',
         'has-[[data-popup-open]]:border-b-transparent has-[[data-popup-open]]:ring-0',
@@ -177,9 +177,18 @@ const comboboxAnchorVariants = cva('relative transition-colors', {
         'has-[[data-popup-open]]:bg-muted/50 has-[[data-popup-open]]:border-border has-[[data-popup-open]]:ring-0',
       ],
     },
+    size: {
+      default: '',
+      xs: '',
+    },
   },
+  compoundVariants: [
+    { variant: 'default', size: 'default', class: 'min-h-9 gap-1 p-1' },
+    { variant: 'default', size: 'xs', class: 'min-h-6 gap-0.5 p-0.5' },
+  ],
   defaultVariants: {
     variant: 'default',
+    size: 'default',
   },
 })
 
@@ -245,7 +254,7 @@ function ComboboxAnchor({
   ref,
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> }) {
-  const { variant, anchorRef } = useComboboxContext()
+  const { variant, size, anchorRef } = useComboboxContext()
   return (
     <div
       ref={(node) => {
@@ -256,7 +265,7 @@ function ComboboxAnchor({
         else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node
       }}
       data-slot="combobox-anchor"
-      className={cn(comboboxAnchorVariants({ variant }), className)}
+      className={cn(comboboxAnchorVariants({ variant, size }), className)}
       {...props}
     />
   )
