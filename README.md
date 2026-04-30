@@ -100,6 +100,13 @@ export default function App() {
 
 If you use `@tailwindcss/vite` or `@tailwindcss/postcss` in your project, it will process the CSS automatically — no additional Tailwind configuration is needed.
 
+### Typography (prose classes)
+
+`globals.css` registers `@tailwindcss/typography`, so consumers get the
+`prose`, `prose-sm`, `prose-lg`, `prose-invert`, etc. classes for free —
+useful for rendering Markdown, articles, or any rich-text block. The plugin
+ships as a regular dependency of `@fx/ui`, so no extra install is needed.
+
 ## Components
 
 | Category | Components |
