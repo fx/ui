@@ -1,6 +1,6 @@
 import { createRef } from 'react'
 import { assertType, describe, it } from 'vitest'
-import { Button, type ButtonProps } from '../button'
+import { Button, type ButtonProps } from '@/index'
 
 describe('ButtonProps', () => {
   it('accepts children and className', () => {
