@@ -35,9 +35,7 @@ const buttonVariants = cva(
   },
 )
 
-interface ButtonProps
-  extends React.ComponentPropsWithRef<typeof BaseButton>,
-    VariantProps<typeof buttonVariants> {
+interface ButtonOwnProps extends VariantProps<typeof buttonVariants> {
   /**
    * When true, the Button renders its single child element instead of a `<button>`,
    * merging variant classes and props onto that child via Base UI's `render` prop.
@@ -47,6 +45,14 @@ interface ButtonProps
    */
   asChild?: boolean
 }
+
+/**
+ * Base UI types its button props as a union discriminated by `nativeButton`, so
+ * this has to stay an intersection: an interface cannot extend a union, and
+ * declaring it as one silently emits a `ButtonProps` with none of the union's
+ * members — no `children`, no `className`, no native button attributes.
+ */
+type ButtonProps = React.ComponentPropsWithRef<typeof BaseButton> & ButtonOwnProps
 
 /**
  * A button component built on Base UI's Button primitive.
