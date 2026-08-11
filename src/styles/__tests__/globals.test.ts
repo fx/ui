@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import packageJson from '../../../package.json'
 
@@ -15,7 +16,8 @@ import packageJson from '../../../package.json'
  */
 const CONSUMER_PROVIDED = new Set(['tailwindcss'])
 
-const globalsCss = readFileSync(join(__dirname, '..', 'globals.css'), 'utf8')
+const here = dirname(fileURLToPath(import.meta.url))
+const globalsCss = readFileSync(join(here, '..', 'globals.css'), 'utf8')
 
 function packageNameOf(specifier: string): string {
   const segments = specifier.split('/')
@@ -42,10 +44,12 @@ describe('globals.css', () => {
   })
 
   it.each(referencedPackages())('declares %s as a runtime dependency', (name) => {
-    expect(Object.keys(packageJson.dependencies)).toContain(name)
+    // Defaulted so a missing field fails on the assertion rather than throwing
+    // a TypeError that hides which package is actually undeclared.
+    expect(Object.keys(packageJson.dependencies ?? {})).toContain(name)
   })
 
   it.each(referencedPackages())('does not leave %s in devDependencies only', (name) => {
-    expect(Object.keys(packageJson.devDependencies)).not.toContain(name)
+    expect(Object.keys(packageJson.devDependencies ?? {})).not.toContain(name)
   })
 })
