@@ -107,6 +107,18 @@ If you use `@tailwindcss/vite` or `@tailwindcss/postcss` in your project, it wil
 useful for rendering Markdown, articles, or any rich-text block. The plugin
 ships as a regular dependency of `@fx/ui`, so no extra install is needed.
 
+### Animation utilities
+
+`globals.css` imports `tw-animate-css`, so consumers get the enter/exit
+utilities — `animate-in`, `animate-out`, `fade-in`, `zoom-in-95`,
+`slide-in-from-top-2`, and friends — for free. It ships as a regular
+dependency of `@fx/ui`, so no extra install is needed.
+
+`Collapsible` does not use them: `globals.css` defines its own
+`collapsible-down`/`collapsible-up` keyframes against Base UI's
+`--collapsible-panel-height`, because the versions bundled with
+`tw-animate-css` target Radix, Bits, and Reka variables instead.
+
 ## Components
 
 | Category | Components |
