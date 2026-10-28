@@ -40,14 +40,14 @@ function DateRangeFields({
     <fieldset
       {...props}
       data-slot="date-range-fields"
-      className={cn('flex flex-col gap-1', className)}
+      className={cn('flex min-w-0 flex-col gap-1', className)}
       disabled={disabled}
     >
       <legend id={legendId} className="text-sm font-medium">
         {legend}
       </legend>
-      <div className="flex items-end gap-2">
-        <label htmlFor={fromId} className="flex flex-1 flex-col text-xs">
+      <div className="flex min-w-0 flex-wrap items-end gap-2">
+        <label htmlFor={fromId} className="flex min-w-0 flex-[1_1_10rem] flex-col text-xs">
           <span id={fromLabelId} className="text-muted-foreground">
             {fromLabel}
           </span>
@@ -61,7 +61,7 @@ function DateRangeFields({
             onChange={(event) => onChange({ ...value, from: event.currentTarget.value })}
           />
         </label>
-        <label htmlFor={toId} className="flex flex-1 flex-col text-xs">
+        <label htmlFor={toId} className="flex min-w-0 flex-[1_1_10rem] flex-col text-xs">
           <span id={toLabelId} className="text-muted-foreground">
             {toLabel}
           </span>

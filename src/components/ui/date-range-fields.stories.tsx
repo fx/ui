@@ -23,3 +23,15 @@ export const Invalid: Story = {
     error: 'End must follow start.',
   },
 }
+
+export const ConstrainedWidth: Story = {
+  args: { legend: 'Dates', value: { from: '', to: '' }, onChange: () => {} },
+  render: (args) => {
+    const [value, setValue] = React.useState(args.value)
+    return (
+      <div className="flex w-80 max-w-full border p-4">
+        <DateRangeFields {...args} className="w-full" value={value} onChange={setValue} />
+      </div>
+    )
+  },
+}
