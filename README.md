@@ -83,7 +83,7 @@ dependency of `@fx/ui`, so no extra install is needed.
 | Category | Components |
 |---|---|
 | **Foundation** | Button, Badge, Input, Textarea, Label, Skeleton, Separator, AspectRatio |
-| **Form** | Checkbox, Switch, Select, Toggle, ToggleGroup, Progress |
+| **Form** | Checkbox, Switch, Select, Slider, Toggle, ToggleGroup, Progress |
 | **Container** | Card, Alert, Table, Collapsible |
 | **Overlay** | Dialog, AlertDialog, Sheet, Popover, Tooltip, DropdownMenu, Menubar |
 | **Complex** | Toast, Chart |
