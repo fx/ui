@@ -5,6 +5,7 @@ type Theme = 'light' | 'dark' | 'system'
 interface ThemeContextValue {
   theme: Theme
   resolvedTheme: 'light' | 'dark'
+  initialized: boolean
   setTheme: (theme: Theme) => void
 }
 
@@ -22,6 +23,7 @@ function resolveTheme(theme: Theme, systemDark: boolean): 'light' | 'dark' {
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>('system')
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light')
+  const [initialized, setInitialized] = useState(false)
   const mounted = useRef(false)
 
   useEffect(() => {
@@ -34,6 +36,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setThemeState(stored)
     setResolvedTheme(resolved)
     applyThemeClass(resolved)
+    setInitialized(true)
   }, [])
 
   useEffect(() => {
@@ -58,7 +61,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme }}>
+    <ThemeContext.Provider value={{ theme, resolvedTheme, initialized, setTheme }}>
       {children}
     </ThemeContext.Provider>
   )

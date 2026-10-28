@@ -1,4 +1,6 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { useLayoutEffect } from 'react'
+import { renderToString } from 'react-dom/server'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ThemeProvider } from '../../theme-provider'
 import { CommandBlock } from '../command-block'
@@ -173,6 +175,55 @@ describe('ThemeToggle', () => {
       value: () => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() }),
     })
   })
+  it.each([
+    'system',
+    'dark',
+  ] as const)('waits for %s theme resolution before allowing a toggle', (stored) => {
+    localStorage.setItem('theme', stored)
+    let initialLabel: string | null = null
+    let initiallyDisabled = false
+    function EarlyObserver() {
+      useLayoutEffect(() => {
+        const button = document.querySelector<HTMLButtonElement>('[data-slot="theme-toggle"]')
+        initialLabel = button?.getAttribute('aria-label') ?? null
+        initiallyDisabled = button?.disabled ?? false
+        button?.click()
+      }, [])
+      return <ThemeToggle />
+    }
+    render(
+      <ThemeProvider>
+        <EarlyObserver />
+      </ThemeProvider>,
+    )
+    expect(initialLabel).toBe('Loading theme')
+    expect(initiallyDisabled).toBe(true)
+    expect(localStorage.getItem('theme')).toBe(stored)
+    const button = screen.getByRole('button', { name: 'Switch to light theme' })
+    expect(button).toBeEnabled()
+    fireEvent.click(button)
+    expect(localStorage.getItem('theme')).toBe('light')
+  })
+
+  it('renders a disabled, neutral toggle on the server', () => {
+    const markup = renderToString(
+      <ThemeProvider>
+        <ThemeToggle />
+      </ThemeProvider>,
+    )
+    expect(markup).toContain('Loading theme')
+    expect(markup).toContain('disabled')
+  })
+
+  it('honors a caller-disabled toggle after initialization', () => {
+    render(
+      <ThemeProvider>
+        <ThemeToggle disabled />
+      </ThemeProvider>,
+    )
+    expect(screen.getByRole('button', { name: 'Switch to light theme' })).toBeDisabled()
+  })
+
   it('switches from the resolved system theme and persists the choice', () => {
     render(
       <ThemeProvider>
