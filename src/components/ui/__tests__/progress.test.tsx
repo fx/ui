@@ -27,4 +27,16 @@ describe('Progress', () => {
     render(<Progress value={50} className="custom-class" />)
     expect(screen.getByRole('progressbar').className).toContain('custom-class')
   })
+  it('customizes the track and indicator while clamping values', () => {
+    const { container, rerender } = render(
+      <Progress value={150} trackClassName="h-1 bg-muted" indicatorClassName="bg-red-500" />,
+    )
+    expect(container.querySelector('[data-slot="progress-track"]')).toHaveClass('h-1', 'bg-muted')
+    expect(container.querySelector('[data-slot="progress-indicator"]')).toHaveClass('bg-red-500')
+    expect(container.querySelector('[data-slot="progress-indicator"]')).toHaveStyle({
+      width: '100%',
+    })
+    rerender(<Progress value={-10} />)
+    expect(container.querySelector('[data-slot="progress-indicator"]')).toHaveStyle({ width: '0%' })
+  })
 })

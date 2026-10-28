@@ -42,3 +42,19 @@ export const Default: Story = {
     </Sheet>
   ),
 }
+
+export const FlushBottom: Story = {
+  args: { side: 'bottom' },
+  render: () => (
+    <Sheet>
+      <SheetTrigger render={<Button variant="outline" />}>Open sheet</SheetTrigger>
+      <SheetContent side="bottom" flush showCloseButton={false}>
+        <SheetHeader className="p-4">
+          <SheetTitle>Details</SheetTitle>
+          <SheetDescription>Scrollable content</SheetDescription>
+        </SheetHeader>
+        <div className="p-4">Content</div>
+      </SheetContent>
+    </Sheet>
+  ),
+}

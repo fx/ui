@@ -55,14 +55,30 @@ function MenubarTrigger({ className, asChild, children, ...props }: MenubarTrigg
 }
 
 // MenubarContent (Portal + Positioner + Popup)
+interface MenubarContentProps
+  extends React.ComponentPropsWithRef<typeof BaseMenu.Popup>,
+    Pick<
+      React.ComponentPropsWithRef<typeof BaseMenu.Positioner>,
+      'align' | 'alignOffset' | 'side' | 'sideOffset'
+    > {}
+
 function MenubarContent({
   className,
   children,
+  align,
+  alignOffset,
+  side,
+  sideOffset,
   ...props
-}: React.ComponentPropsWithRef<typeof BaseMenu.Popup>) {
+}: MenubarContentProps) {
   return (
     <BaseMenu.Portal className="fixed inset-0 z-[60] pointer-events-none [&>*]:pointer-events-auto">
-      <BaseMenu.Positioner>
+      <BaseMenu.Positioner
+        {...(align !== undefined && { align })}
+        {...(alignOffset !== undefined && { alignOffset })}
+        {...(side !== undefined && { side })}
+        {...(sideOffset !== undefined && { sideOffset })}
+      >
         <BaseMenu.Popup
           data-slot="menubar-content"
           className={cn(
@@ -274,4 +290,4 @@ export {
   MenubarSubTrigger,
   MenubarSubContent,
 }
-export type { MenubarTriggerProps }
+export type { MenubarTriggerProps, MenubarContentProps }

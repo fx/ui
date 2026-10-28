@@ -22,3 +22,14 @@ export const Default: Story = {
     </Collapsible>
   ),
 }
+
+export const CustomTrigger: Story = {
+  render: () => (
+    <Collapsible>
+      <CollapsibleTrigger asChild>
+        <div className="cursor-pointer border p-2">Toggle content</div>
+      </CollapsibleTrigger>
+      <CollapsibleContent>Content</CollapsibleContent>
+    </Collapsible>
+  ),
+}
