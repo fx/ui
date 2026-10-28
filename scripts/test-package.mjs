@@ -4,6 +4,7 @@ import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promis
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { transform } from 'lightningcss'
+import { parseAst } from 'rollup/parseAst'
 
 const root = process.cwd()
 const fixture = await mkdtemp(join(tmpdir(), 'fx-ui-package-test-'))
@@ -12,7 +13,7 @@ const run = (command, args, cwd = fixture) =>
 
 try {
   run('npm', ['pack', '--ignore-scripts', '--pack-destination', fixture], root)
-  const { version, patchedDependencies } = JSON.parse(
+  const { version, patchedDependencies, dependencies, peerDependencies } = JSON.parse(
     await readFile(join(root, 'package.json'), 'utf8'),
   )
   assert.deepEqual(
@@ -31,7 +32,15 @@ try {
       dependencies: { '@fx/ui': `file:./${packed}`, react: '19.2.4', 'react-dom': '19.2.4' },
     }),
   )
-  run('npm', ['install', '--ignore-scripts', '--no-package-lock', '--no-audit', '--no-fund'])
+  run('npm', [
+    'install',
+    '--install-strategy=nested',
+    '--install-strategy=nested',
+    '--ignore-scripts',
+    '--no-package-lock',
+    '--no-audit',
+    '--no-fund',
+  ])
   const files = await readdir(join(destination, 'dist'))
   assert.equal(files.filter((file) => /^base-ui-.*\.js$/.test(file)).length, 1)
   assert.equal(files.filter((file) => /^base-ui-.*\.cjs$/.test(file)).length, 1)
@@ -42,6 +51,38 @@ try {
     'index.js',
     'styles',
   ])
+
+  const declared = Object.keys({ ...dependencies, ...peerDependencies })
+  function inspectImports(node, file) {
+    if (!node || typeof node !== 'object') return
+    let specifier
+    if (
+      node.type === 'ImportDeclaration' ||
+      node.type === 'ExportNamedDeclaration' ||
+      node.type === 'ExportAllDeclaration'
+    )
+      specifier = node.source?.value
+    if (node.type === 'ImportExpression') specifier = node.source?.value
+    if (node.type === 'CallExpression' && node.callee?.name === 'require')
+      specifier = node.arguments[0]?.value
+    if (
+      typeof specifier === 'string' &&
+      !specifier.startsWith('.') &&
+      !specifier.startsWith('node:')
+    ) {
+      assert.ok(
+        declared.some((name) => specifier === name || specifier.startsWith(`${name}/`)),
+        `${file}: undeclared import ${specifier}`,
+      )
+    }
+    for (const value of Object.values(node)) {
+      if (Array.isArray(value)) for (const child of value) inspectImports(child, file)
+      else if (value && typeof value === 'object') inspectImports(value, file)
+    }
+  }
+  for (const file of files.filter((name) => /\.(js|cjs)$/.test(name))) {
+    inspectImports(parseAst(await readFile(join(destination, 'dist', file), 'utf8')), file)
+  }
 
   await writeFile(
     join(fixture, 'esm.mjs'),
@@ -56,6 +97,7 @@ try {
 
   run('npm', [
     'install',
+    '--install-strategy=nested',
     '--ignore-scripts',
     '--no-package-lock',
     '--no-audit',
@@ -125,6 +167,55 @@ void [ui.Button, props]
     }),
   )
   run(join(fixture, 'node_modules/.bin/tsc'), ['-p', 'tsconfig-bundler.json'])
+
+  // pnpm resolves dependencies from isolated realpaths, unlike npm's nested layout.
+  const isolated = join(fixture, 'pnpm-consumer')
+  await mkdir(isolated)
+  await writeFile(
+    join(isolated, 'package.json'),
+    JSON.stringify({
+      private: true,
+      dependencies: {
+        '@fx/ui': `file:../${packed}`,
+        react: '19.2.4',
+        'react-dom': '19.2.4',
+        '@types/react': '19.2.14',
+        '@types/react-dom': '19.2.3',
+        typescript: '5.9.3',
+      },
+    }),
+  )
+  for (const file of [
+    'consumer.mts',
+    'consumer.cts',
+    'tsconfig.json',
+    'tsconfig-bundler.json',
+    'esm.mjs',
+    'cjs.cjs',
+  ]) {
+    await writeFile(join(isolated, file), await readFile(join(fixture, file)))
+  }
+  run(
+    'npm',
+    [
+      'exec',
+      '--yes',
+      '--package',
+      'pnpm@10.34.9',
+      '--',
+      'pnpm',
+      'install',
+      '--config.node-linker=isolated',
+      '--config.hoist=false',
+      '--ignore-scripts',
+    ],
+    isolated,
+  )
+  const isolatedTsc = join(isolated, 'node_modules/.bin/tsc')
+  run(isolatedTsc, ['-p', 'tsconfig.json'], isolated)
+  run(isolatedTsc, ['-p', 'tsconfig-bundler.json'], isolated)
+  run(process.execPath, ['esm.mjs'], isolated)
+  run(process.execPath, ['cjs.cjs'], isolated)
 
   await mkdir(join(fixture, 'src'))
   const readme = await readFile(join(root, 'README.md'), 'utf8')
