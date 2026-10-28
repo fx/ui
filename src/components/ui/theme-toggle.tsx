@@ -2,7 +2,10 @@ import { Moon, Sun } from 'lucide-react'
 import { useTheme } from '../theme-provider'
 import { Button, type ButtonProps } from './button'
 
-type ThemeToggleProps = Omit<ButtonProps, 'children' | 'onClick' | 'aria-label'>
+type ThemeToggleProps = Omit<
+  ButtonProps,
+  'children' | 'onClick' | 'aria-label' | 'asChild' | 'render' | 'nativeButton'
+>
 
 function ThemeToggle({ variant = 'ghost', size = 'icon', ...props }: ThemeToggleProps) {
   const { resolvedTheme, setTheme } = useTheme()
@@ -10,6 +13,7 @@ function ThemeToggle({ variant = 'ghost', size = 'icon', ...props }: ThemeToggle
   return (
     <Button
       {...props}
+      data-slot="theme-toggle"
       variant={variant}
       size={size}
       aria-label={`Switch to ${next} theme`}
