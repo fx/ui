@@ -404,8 +404,7 @@ function ComboboxContent({
     <BaseCombobox.Portal className="fixed inset-0 z-[60] pointer-events-none [&>*]:pointer-events-auto">
       <BaseCombobox.Positioner
         sideOffset={variant === 'dropdown' ? 4 : -1}
-        anchor={variant === 'default' ? anchorRef : undefined}
-        align={variant === 'dropdown' ? 'start' : undefined}
+        {...(variant === 'default' ? { anchor: anchorRef } : { align: 'start' as const })}
       >
         <BaseCombobox.Popup
           data-slot="combobox-content"

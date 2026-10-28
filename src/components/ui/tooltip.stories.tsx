@@ -33,3 +33,16 @@ export const AsChildTrigger: Story = {
     </TooltipProvider>
   ),
 }
+
+export const Delayed: Story = {
+  render: () => (
+    <TooltipProvider>
+      <Tooltip delayDuration={800}>
+        <TooltipTrigger render={<Button variant="outline" />}>
+          Hover for a delayed tooltip
+        </TooltipTrigger>
+        <TooltipContent>Appears after 800 ms</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  ),
+}

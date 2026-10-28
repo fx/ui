@@ -33,11 +33,17 @@ interface BadgeProps
 }
 
 function Badge({ className, variant, asChild, children, ...props }: BadgeProps) {
-  const Comp = asChild ? Slot : 'span'
+  if (asChild) {
+    return (
+      <Slot data-slot="badge" className={cn(badgeVariants({ variant }), className)} {...props}>
+        {children as React.ReactElement<Record<string, unknown>>}
+      </Slot>
+    )
+  }
   return (
-    <Comp data-slot="badge" className={cn(badgeVariants({ variant }), className)} {...props}>
+    <span data-slot="badge" className={cn(badgeVariants({ variant }), className)} {...props}>
       {children}
-    </Comp>
+    </span>
   )
 }
 

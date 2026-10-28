@@ -115,7 +115,7 @@ function MenubarCheckboxItem({
         'relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8 text-sm outline-none select-none transition-colors data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
         className,
       )}
-      checked={checked}
+      {...(checked === undefined ? {} : { checked })}
       {...props}
     >
       <span className="absolute left-2 flex size-3.5 items-center justify-center">
@@ -181,10 +181,11 @@ function MenubarLabel({
 }
 
 // MenubarSeparator
-function MenubarSeparator({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+function MenubarSeparator({ className, style, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <BaseMenu.Separator
       data-slot="menubar-separator"
+      {...(style === undefined ? {} : { style })}
       className={cn('-mx-1 my-1 h-px bg-border', className)}
       {...props}
     />

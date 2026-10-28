@@ -8,9 +8,14 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./styles/globals.css": "./dist/styles/globals.css"
   },
@@ -28,13 +33,14 @@
     "url": "git+https://github.com/fx/ui.git"
   },
   "scripts": {
-    "build": "vite build && mkdir -p dist/styles && cp src/styles/globals.css dist/styles/globals.css",
+    "build": "tsc --noEmit && vite build && node scripts/build-types.mjs && mkdir -p dist/styles && cp src/styles/globals.css dist/styles/globals.css",
     "test": "vitest run",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "prepare": "husky",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "test:package": "bun run build && node scripts/test-package.mjs"
   },
   "peerDependencies": {
     "react": "^19",
@@ -70,6 +76,8 @@
     "lint-staged": "^16",
     "react": "^19",
     "react-dom": "^19",
+    "rollup": "4.59.0",
+    "rollup-plugin-dts": "^6.5.1",
     "storybook": "10.2.13",
     "tailwindcss": "^4",
     "typescript": "^5.7",

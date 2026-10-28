@@ -9,13 +9,19 @@ function TooltipProvider({ ...props }: TooltipProviderProps) {
   return <BaseTooltip.Provider data-slot="tooltip-provider" {...props} />
 }
 
+const TooltipDelayContext = React.createContext<number | undefined>(undefined)
+
 // Tooltip Root
 interface TooltipProps extends Omit<React.ComponentPropsWithRef<typeof BaseTooltip.Root>, 'delay'> {
   delayDuration?: number
 }
 
 function Tooltip({ delayDuration = 0, ...props }: TooltipProps) {
-  return <BaseTooltip.Root data-slot="tooltip" {...props} delay={delayDuration} />
+  return (
+    <TooltipDelayContext.Provider value={delayDuration}>
+      <BaseTooltip.Root data-slot="tooltip" {...props} />
+    </TooltipDelayContext.Provider>
+  )
 }
 
 // TooltipTrigger
@@ -24,11 +30,13 @@ interface TooltipTriggerProps extends React.ComponentPropsWithRef<typeof BaseToo
 }
 
 function TooltipTrigger({ className, asChild, children, ...props }: TooltipTriggerProps) {
+  const delay = React.useContext(TooltipDelayContext)
   if (asChild) {
     const child = React.Children.only(children) as React.ReactElement<Record<string, unknown>>
     return (
       <BaseTooltip.Trigger
         data-slot="tooltip-trigger"
+        {...(delay === undefined ? {} : { delay })}
         className={cn(className)}
         render={child}
         {...props}
@@ -37,7 +45,12 @@ function TooltipTrigger({ className, asChild, children, ...props }: TooltipTrigg
   }
 
   return (
-    <BaseTooltip.Trigger data-slot="tooltip-trigger" className={cn(className)} {...props}>
+    <BaseTooltip.Trigger
+      data-slot="tooltip-trigger"
+      {...(delay === undefined ? {} : { delay })}
+      className={cn(className)}
+      {...props}
+    >
       {children}
     </BaseTooltip.Trigger>
   )

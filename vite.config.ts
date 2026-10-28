@@ -13,8 +13,10 @@ export default defineConfig({
     tailwindcss(),
     dts({
       include: ['src'],
-      outDir: 'dist',
-      rollupTypes: true,
+      exclude: ['**/*.test-d.tsx', '**/*.test.ts', '**/*.test.tsx', '**/*.stories.tsx'],
+      outDir: 'dist/types',
+      rollupTypes: false,
+      compilerOptions: { declarationMap: false },
     }),
   ],
   build: {

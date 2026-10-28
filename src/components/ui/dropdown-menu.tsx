@@ -135,7 +135,7 @@ function DropdownMenuCheckboxItem({
         'relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8 text-sm outline-none select-none transition-colors data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
         className,
       )}
-      checked={checked}
+      {...(checked === undefined ? {} : { checked })}
       {...props}
     >
       <span className="absolute left-2 flex size-3.5 items-center justify-center">
@@ -188,10 +188,15 @@ function DropdownMenuRadioItem({
 }
 
 // DropdownMenuSeparator
-function DropdownMenuSeparator({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+function DropdownMenuSeparator({
+  className,
+  style,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <BaseMenu.Separator
       data-slot="dropdown-menu-separator"
+      {...(style === undefined ? {} : { style })}
       className={cn('-mx-1 my-1 h-px bg-border', className)}
       {...props}
     />
