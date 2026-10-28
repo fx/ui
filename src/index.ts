@@ -68,6 +68,7 @@ export {
   ChartTooltip,
   ChartTooltipContent,
   type ChartTooltipContentProps,
+  type ChartTooltipPayload,
   type ChartTooltipProps,
 } from './components/ui/chart'
 // Form
@@ -88,6 +89,7 @@ export {
   ComboboxChips,
   type ComboboxChipsProps,
   ComboboxContent,
+  type ComboboxContentProps,
   type ComboboxContextValue,
   ComboboxEmpty,
   ComboboxGroup,
@@ -162,6 +164,7 @@ export {
   Menubar,
   MenubarCheckboxItem,
   MenubarContent,
+  type MenubarContentProps,
   MenubarItem,
   MenubarLabel,
   MenubarMenu,
@@ -216,6 +219,7 @@ export {
   type SheetTriggerProps,
 } from './components/ui/sheet'
 export { Skeleton, type SkeletonProps } from './components/ui/skeleton'
+export { Slider, type SliderProps } from './components/ui/slider'
 export {
   StatusOverlay,
   type StatusOverlayProps,

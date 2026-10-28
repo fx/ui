@@ -40,13 +40,13 @@ function SheetClose({ className, ...props }: React.ComponentPropsWithRef<typeof 
 }
 
 const sheetContentVariants = cva(
-  'fixed z-50 flex flex-col gap-4 bg-background p-6 shadow-lg transition-transform ease-in-out duration-500 data-[ending-style]:duration-300',
+  'fixed z-50 flex flex-col gap-4 overflow-y-auto bg-background p-6 shadow-lg transition-transform ease-in-out duration-500 data-[ending-style]:duration-300 motion-reduce:transition-none',
   {
     variants: {
       side: {
-        top: 'inset-x-0 top-0 border-b data-[starting-style]:-translate-y-full data-[ending-style]:-translate-y-full',
+        top: 'inset-x-0 top-0 max-h-dvh border-b data-[starting-style]:-translate-y-full data-[ending-style]:-translate-y-full',
         bottom:
-          'inset-x-0 bottom-0 border-t data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full',
+          'inset-x-0 bottom-0 max-h-[85dvh] border-t pb-[max(1.5rem,env(safe-area-inset-bottom))] data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full',
         left: 'inset-y-0 left-0 h-full w-3/4 border-r sm:max-w-sm data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full',
         right:
           'inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full',
@@ -61,28 +61,45 @@ const sheetContentVariants = cva(
 // SheetContent
 interface SheetContentProps
   extends React.ComponentPropsWithRef<typeof BaseDialog.Popup>,
-    VariantProps<typeof sheetContentVariants> {}
+    VariantProps<typeof sheetContentVariants> {
+  flush?: boolean
+  showCloseButton?: boolean
+}
 
-function SheetContent({ side = 'right', className, children, ...props }: SheetContentProps) {
+function SheetContent({
+  side = 'right',
+  className,
+  children,
+  flush = false,
+  showCloseButton = true,
+  ...props
+}: SheetContentProps) {
   return (
     <BaseDialog.Portal>
       <BaseDialog.Backdrop
         data-slot="sheet-overlay"
-        className="fixed inset-0 z-50 bg-black/50 transition-opacity duration-300 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0"
+        className="fixed inset-0 z-50 bg-black/50 transition-opacity duration-300 motion-reduce:transition-none data-[starting-style]:opacity-0 data-[ending-style]:opacity-0"
       />
       <BaseDialog.Popup
         data-slot="sheet-content"
-        className={cn(sheetContentVariants({ side }), className)}
+        className={cn(
+          sheetContentVariants({ side }),
+          flush && 'gap-0 p-0',
+          flush && side === 'bottom' && 'pb-[env(safe-area-inset-bottom)]',
+          className,
+        )}
         {...props}
       >
         {children}
-        <BaseDialog.Close
-          data-slot="sheet-close"
-          className="absolute top-4 right-4 rounded-none opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none disabled:pointer-events-none"
-        >
-          <X className="size-4" />
-          <span className="sr-only">Close</span>
-        </BaseDialog.Close>
+        {showCloseButton && (
+          <BaseDialog.Close
+            data-slot="sheet-close"
+            className="absolute top-1 right-1 flex size-10 items-center justify-center rounded-none opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none disabled:pointer-events-none"
+          >
+            <X className="size-4" />
+            <span className="sr-only">Close</span>
+          </BaseDialog.Close>
+        )}
       </BaseDialog.Popup>
     </BaseDialog.Portal>
   )
@@ -93,7 +110,7 @@ function SheetHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElemen
   return (
     <div
       data-slot="sheet-header"
-      className={cn('flex flex-col gap-2 text-center sm:text-left', className)}
+      className={cn('flex flex-col gap-2 text-left', className)}
       {...props}
     />
   )

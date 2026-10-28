@@ -219,4 +219,82 @@ describe('Sheet', () => {
     await user.click(screen.getByRole('button', { name: 'Open' }))
     expect(screen.getByTestId('content').className).toContain('custom-class')
   })
+  it('supports scrollable flush bottom content and hides the close button', () => {
+    render(
+      <Sheet open>
+        <SheetContent side="bottom" flush showCloseButton={false} data-testid="content">
+          Content
+        </SheetContent>
+      </Sheet>,
+    )
+    expect(screen.getByTestId('content')).toHaveClass(
+      'overflow-y-auto',
+      'max-h-[85dvh]',
+      'p-0',
+      'pb-[env(safe-area-inset-bottom)]',
+    )
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument()
+  })
+
+  it('allows custom padding to override flush defaults', () => {
+    render(
+      <Sheet open>
+        <SheetContent side="bottom" flush className="pb-4" data-testid="content">
+          Content
+        </SheetContent>
+      </Sheet>,
+    )
+    expect(screen.getByTestId('content')).toHaveClass('p-0', 'pb-4')
+    expect(screen.getByTestId('content')).not.toHaveClass('pb-[env(safe-area-inset-bottom)]')
+  })
+  it('constrains top content and allows a sizing override', () => {
+    const { rerender } = render(
+      <Sheet open>
+        <SheetContent side="top" data-testid="content">
+          Tall content
+        </SheetContent>
+      </Sheet>,
+    )
+    expect(screen.getByTestId('content')).toHaveClass('overflow-y-auto', 'max-h-dvh')
+    rerender(
+      <Sheet open>
+        <SheetContent side="top" className="max-h-[50dvh]" data-testid="content">
+          Tall content
+        </SheetContent>
+      </Sheet>,
+    )
+    expect(screen.getByTestId('content')).toHaveClass('max-h-[50dvh]')
+    expect(screen.getByTestId('content')).not.toHaveClass('max-h-dvh')
+  })
+
+  it.each(['left', 'right'] as const)('keeps %s content constrained to the viewport', (side) => {
+    render(
+      <Sheet open>
+        <SheetContent side={side} data-testid="content">
+          Tall content
+        </SheetContent>
+      </Sheet>,
+    )
+    expect(screen.getByTestId('content')).toHaveClass('overflow-y-auto', 'h-full', 'inset-y-0')
+  })
+  it('allows bottom and side height overrides', () => {
+    const { rerender } = render(
+      <Sheet open>
+        <SheetContent side="bottom" className="max-h-[50dvh]" data-testid="content">
+          Content
+        </SheetContent>
+      </Sheet>,
+    )
+    expect(screen.getByTestId('content')).toHaveClass('max-h-[50dvh]')
+    expect(screen.getByTestId('content')).not.toHaveClass('max-h-[85dvh]')
+    rerender(
+      <Sheet open>
+        <SheetContent side="left" className="h-[50dvh]" data-testid="content">
+          Content
+        </SheetContent>
+      </Sheet>,
+    )
+    expect(screen.getByTestId('content')).toHaveClass('h-[50dvh]')
+    expect(screen.getByTestId('content')).not.toHaveClass('h-full')
+  })
 })

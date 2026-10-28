@@ -4,9 +4,17 @@ import { cn } from '@/lib/utils'
 interface ProgressProps
   extends Omit<React.ComponentPropsWithRef<typeof BaseProgress.Root>, 'value'> {
   value?: number | undefined
+  trackClassName?: string
+  indicatorClassName?: string
 }
 
-function Progress({ className, value = 0, ...props }: ProgressProps) {
+function Progress({
+  className,
+  trackClassName,
+  indicatorClassName,
+  value = 0,
+  ...props
+}: ProgressProps) {
   const clampedValue = Math.min(100, Math.max(0, value))
   return (
     <BaseProgress.Root
@@ -17,11 +25,14 @@ function Progress({ className, value = 0, ...props }: ProgressProps) {
     >
       <BaseProgress.Track
         data-slot="progress-track"
-        className="relative h-2 w-full overflow-hidden bg-primary/20"
+        className={cn('relative h-2 w-full overflow-hidden bg-primary/20', trackClassName)}
       >
         <BaseProgress.Indicator
           data-slot="progress-indicator"
-          className="h-full bg-primary transition-[width] duration-300 ease-in-out"
+          className={cn(
+            'h-full bg-primary transition-[width] duration-300 ease-in-out',
+            indicatorClassName,
+          )}
           style={{ width: `${clampedValue}%` }}
         />
       </BaseProgress.Track>

@@ -51,6 +51,8 @@ import './index.css'
 
 > **Why not just `import '@fx/ui/styles/globals.css'` directly?** The imported stylesheet supplies the theme tokens, but Tailwind also needs to scan the compiled component classes. Use the entrypoint above to include those classes and your application's sources.
 
+> Process this CSS with Tailwind; importing it as plain browser CSS does not compile its directives. Theme tokens, typography, fonts, and animation utilities are registered by the shared stylesheet. The `@source` directive includes the compiled component classes.
+
 ### 3. Use components
 
 ```tsx
@@ -89,7 +91,7 @@ dependency of `@fx/ui`, so no extra install is needed.
 | Category | Components |
 |---|---|
 | **Foundation** | Button, Badge, Input, Textarea, Label, Skeleton, Separator, AspectRatio |
-| **Form** | Checkbox, Switch, Select, Toggle, ToggleGroup, Progress |
+| **Form** | Checkbox, Switch, Select, Slider, Toggle, ToggleGroup, Progress |
 | **Container** | Card, Alert, Table, Collapsible |
 | **Overlay** | Dialog, AlertDialog, Sheet, Popover, Tooltip, DropdownMenu, Menubar |
 | **Complex** | Toast, Chart |

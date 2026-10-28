@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
@@ -6,6 +7,11 @@ import { defineConfig } from 'vite'
 import dts from 'vite-plugin-dts'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
+const manifest = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf8'))
+const externalPackages = Object.keys({
+  ...manifest.dependencies,
+  ...manifest.peerDependencies,
+}).filter((name) => name !== '@base-ui-components/react')
 
 export default defineConfig({
   plugins: [
@@ -26,8 +32,11 @@ export default defineConfig({
       fileName: (format) => `index.${format === 'es' ? 'js' : 'cjs'}`,
     },
     rollupOptions: {
-      external: (id) => !id.startsWith('.') && !id.startsWith('/') && !id.startsWith('@/'),
+      external: (id) => externalPackages.some((name) => id === name || id.startsWith(`${name}/`)),
       output: {
+        manualChunks(id) {
+          if (id.includes('/node_modules/')) return 'base-ui'
+        },
         globals: {
           react: 'React',
           'react-dom': 'ReactDOM',

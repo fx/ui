@@ -55,18 +55,34 @@ function MenubarTrigger({ className, asChild, children, ...props }: MenubarTrigg
 }
 
 // MenubarContent (Portal + Positioner + Popup)
+interface MenubarContentProps
+  extends React.ComponentPropsWithRef<typeof BaseMenu.Popup>,
+    Pick<
+      React.ComponentPropsWithRef<typeof BaseMenu.Positioner>,
+      'align' | 'alignOffset' | 'side' | 'sideOffset'
+    > {}
+
 function MenubarContent({
   className,
   children,
+  align,
+  alignOffset,
+  side,
+  sideOffset,
   ...props
-}: React.ComponentPropsWithRef<typeof BaseMenu.Popup>) {
+}: MenubarContentProps) {
   return (
     <BaseMenu.Portal className="fixed inset-0 z-[60] pointer-events-none [&>*]:pointer-events-auto">
-      <BaseMenu.Positioner>
+      <BaseMenu.Positioner
+        {...(align !== undefined && { align })}
+        {...(alignOffset !== undefined && { alignOffset })}
+        {...(side !== undefined && { side })}
+        {...(sideOffset !== undefined && { sideOffset })}
+      >
         <BaseMenu.Popup
           data-slot="menubar-content"
           className={cn(
-            'z-[60] min-w-[12rem] overflow-hidden border bg-popover p-1 text-popover-foreground shadow-md transition-all duration-200',
+            'z-[60] min-w-[12rem] overflow-hidden border bg-popover p-1 text-popover-foreground shadow-md transition-all duration-200 motion-reduce:transition-none',
             'data-[starting-style]:opacity-0 data-[starting-style]:scale-95',
             'data-[ending-style]:opacity-0 data-[ending-style]:scale-95',
             className,
@@ -115,7 +131,7 @@ function MenubarCheckboxItem({
         'relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8 text-sm outline-none select-none transition-colors data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
         className,
       )}
-      {...(checked === undefined ? {} : { checked })}
+      {...(checked !== undefined ? { checked } : {})}
       {...props}
     >
       <span className="absolute left-2 flex size-3.5 items-center justify-center">
@@ -181,11 +197,13 @@ function MenubarLabel({
 }
 
 // MenubarSeparator
-function MenubarSeparator({ className, style, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+function MenubarSeparator({
+  className,
+  ...props
+}: React.ComponentPropsWithRef<typeof BaseMenu.Separator>) {
   return (
     <BaseMenu.Separator
       data-slot="menubar-separator"
-      {...(style === undefined ? {} : { style })}
       className={cn('-mx-1 my-1 h-px bg-border', className)}
       {...props}
     />
@@ -245,7 +263,7 @@ function MenubarSubContent({
         <BaseMenu.Popup
           data-slot="menubar-sub-content"
           className={cn(
-            'z-[60] min-w-[8rem] overflow-hidden border bg-popover p-1 text-popover-foreground shadow-lg transition-all duration-200',
+            'z-[60] min-w-[8rem] overflow-hidden border bg-popover p-1 text-popover-foreground shadow-lg transition-all duration-200 motion-reduce:transition-none',
             'data-[starting-style]:opacity-0 data-[starting-style]:scale-95',
             'data-[ending-style]:opacity-0 data-[ending-style]:scale-95',
             className,
@@ -275,4 +293,4 @@ export {
   MenubarSubTrigger,
   MenubarSubContent,
 }
-export type { MenubarTriggerProps }
+export type { MenubarTriggerProps, MenubarContentProps }

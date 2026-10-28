@@ -26,7 +26,7 @@ function ToastViewport({
     <BaseToast.Viewport
       data-slot="toast-viewport"
       className={cn(
-        'fixed z-[100] flex max-h-screen flex-col-reverse p-4',
+        'pointer-events-none fixed z-[100] flex max-h-screen flex-col-reverse p-4',
         'top-0 right-0 left-0 sm:top-auto sm:right-0 sm:bottom-0 sm:left-auto sm:flex-col',
         'sm:max-w-[420px]',
         className,
@@ -47,7 +47,7 @@ function ToastRoot({ className, toast, ...props }: ToastRootProps) {
       className={cn(
         'group pointer-events-auto relative flex w-full items-center justify-between gap-4 overflow-hidden border p-4 shadow-lg',
         'bg-background text-foreground',
-        'transition-all duration-300',
+        'transition-all duration-300 motion-reduce:transition-none',
         'data-[swipe=move]:translate-x-[var(--toast-swipe-move-x)] data-[swipe=move]:translate-y-[var(--toast-swipe-move-y)]',
         'data-[starting-style]:sm:translate-x-full data-[starting-style]:max-sm:-translate-y-full',
         'data-[ending-style]:sm:translate-x-full data-[ending-style]:opacity-0',

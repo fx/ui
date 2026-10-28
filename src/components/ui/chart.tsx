@@ -75,17 +75,30 @@ function ChartTooltip(props: ChartTooltipProps) {
 }
 
 // ChartTooltipContent
+interface ChartTooltipPayload {
+  name?: string
+  value?: string | number
+  dataKey?: string | number
+  color?: string
+  payload?: Record<string, unknown>
+  fill?: string
+}
+
 interface ChartTooltipContentProps extends React.HTMLAttributes<HTMLDivElement> {
   active?: boolean
-  payload?: Array<{
-    name?: string
-    value?: string | number
-    dataKey?: string | number
-    color?: string
-    payload?: Record<string, unknown>
-    fill?: string
-  }>
-  label?: string
+  payload?: ChartTooltipPayload[]
+  label?: string | number
+  formatter?: (
+    value: string | number | undefined,
+    name: string | undefined,
+    item: ChartTooltipPayload,
+    index: number,
+    payload: Record<string, unknown> | undefined,
+  ) => React.ReactNode
+  labelFormatter?: (
+    label: string | number | undefined,
+    payload: ChartTooltipPayload[],
+  ) => React.ReactNode
   labelKey?: string
   nameKey?: string
   hideLabel?: boolean
@@ -103,6 +116,8 @@ function ChartTooltipContent({
   hideLabel = false,
   hideIndicator = false,
   indicator = 'dot',
+  formatter,
+  labelFormatter,
 }: ChartTooltipContentProps) {
   const config = useChartConfig()
 
@@ -110,7 +125,8 @@ function ChartTooltipContent({
     return null
   }
 
-  const tooltipLabel = labelKey ? config[labelKey]?.label || labelKey : label
+  const tooltipLabel = labelKey ? (config[labelKey]?.label ?? labelKey) : label
+  const displayLabel = labelFormatter ? labelFormatter(label, payload) : tooltipLabel
 
   return (
     <div
@@ -120,7 +136,7 @@ function ChartTooltipContent({
         className,
       )}
     >
-      {!hideLabel && tooltipLabel && <div className="font-medium">{tooltipLabel}</div>}
+      {!hideLabel && displayLabel != null && <div className="font-medium">{displayLabel}</div>}
       <div className="grid gap-1.5">
         {payload.map((item, index) => {
           const key = String(nameKey ? item.payload?.[nameKey] : item.name || item.dataKey)
@@ -132,31 +148,40 @@ function ChartTooltipContent({
               key={item.dataKey ?? item.name ?? index}
               className="flex w-full flex-wrap items-stretch gap-2 [&>svg]:size-2.5 [&>svg]:text-muted-foreground"
             >
-              {!hideIndicator && (
-                <div
-                  className={cn('shrink-0 rounded-[2px] border-[--color-border] bg-[--color-bg]', {
-                    'h-2.5 w-2.5': indicator === 'dot',
-                    'w-1': indicator === 'line',
-                    'w-0 border-[1.5px] border-dashed bg-transparent': indicator === 'dashed',
-                  })}
-                  style={
-                    {
-                      '--color-bg': indicatorColor,
-                      '--color-border': indicatorColor,
-                    } as React.CSSProperties
-                  }
-                />
+              {formatter ? (
+                formatter(item.value, item.name, item, index, item.payload)
+              ) : (
+                <>
+                  {!hideIndicator && (
+                    <div
+                      className={cn(
+                        'shrink-0 rounded-[2px] border-[--color-border] bg-[--color-bg]',
+                        {
+                          'h-2.5 w-2.5': indicator === 'dot',
+                          'w-1': indicator === 'line',
+                          'w-0 border-[1.5px] border-dashed bg-transparent': indicator === 'dashed',
+                        },
+                      )}
+                      style={
+                        {
+                          '--color-bg': indicatorColor,
+                          '--color-border': indicatorColor,
+                        } as React.CSSProperties
+                      }
+                    />
+                  )}
+                  <div className="flex flex-1 justify-between gap-2 leading-none">
+                    <div className="grid gap-1.5">
+                      <span className="text-muted-foreground">{itemConfig?.label || key}</span>
+                    </div>
+                    {item.value !== undefined && (
+                      <span className="font-mono font-medium tabular-nums text-foreground">
+                        {item.value.toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+                </>
               )}
-              <div className="flex flex-1 justify-between gap-2 leading-none">
-                <div className="grid gap-1.5">
-                  <span className="text-muted-foreground">{itemConfig?.label || key}</span>
-                </div>
-                {item.value !== undefined && (
-                  <span className="font-mono font-medium tabular-nums text-foreground">
-                    {item.value.toLocaleString()}
-                  </span>
-                )}
-              </div>
             </div>
           )
         })}
@@ -241,6 +266,7 @@ export type {
   ChartContainerProps,
   ChartTooltipProps,
   ChartTooltipContentProps,
+  ChartTooltipPayload,
   ChartLegendProps,
   ChartLegendContentProps,
 }

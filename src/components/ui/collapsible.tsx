@@ -13,14 +13,30 @@ interface CollapsibleTriggerProps
   asChild?: boolean
 }
 
-function CollapsibleTrigger({ asChild, children, ...props }: CollapsibleTriggerProps) {
+function CollapsibleTrigger({
+  asChild,
+  children,
+  nativeButton,
+  ...props
+}: CollapsibleTriggerProps) {
   if (asChild) {
     const child = React.Children.only(children) as React.ReactElement<Record<string, unknown>>
-    return <BaseCollapsible.Trigger data-slot="collapsible-trigger" render={child} {...props} />
+    return (
+      <BaseCollapsible.Trigger
+        data-slot="collapsible-trigger"
+        render={child}
+        nativeButton={nativeButton ?? false}
+        {...props}
+      />
+    )
   }
 
   return (
-    <BaseCollapsible.Trigger data-slot="collapsible-trigger" {...props}>
+    <BaseCollapsible.Trigger
+      data-slot="collapsible-trigger"
+      nativeButton={nativeButton ?? true}
+      {...props}
+    >
       {children}
     </BaseCollapsible.Trigger>
   )
