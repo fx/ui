@@ -96,6 +96,8 @@ dependency of `@fx/ui`, so no extra install is needed.
 
 ## Development
 
+Use Bun to install repository dependencies and maintain the authoritative `bun.lock`. The packed-consumer verification uses npm to test installation of the published package.
+
 ```sh
 bun install          # Install dependencies
 bun run build        # Build library
