@@ -40,7 +40,7 @@ function SheetClose({ className, ...props }: React.ComponentPropsWithRef<typeof 
 }
 
 const sheetContentVariants = cva(
-  'fixed z-50 flex flex-col gap-4 bg-background p-6 shadow-lg transition-transform ease-in-out duration-500 data-[ending-style]:duration-300',
+  'fixed z-50 flex flex-col gap-4 bg-background p-6 shadow-lg transition-transform ease-in-out duration-500 data-[ending-style]:duration-300 motion-reduce:transition-none',
   {
     variants: {
       side: {
@@ -68,7 +68,7 @@ function SheetContent({ side = 'right', className, children, ...props }: SheetCo
     <BaseDialog.Portal>
       <BaseDialog.Backdrop
         data-slot="sheet-overlay"
-        className="fixed inset-0 z-50 bg-black/50 transition-opacity duration-300 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0"
+        className="fixed inset-0 z-50 bg-black/50 transition-opacity duration-300 motion-reduce:transition-none data-[starting-style]:opacity-0 data-[ending-style]:opacity-0"
       />
       <BaseDialog.Popup
         data-slot="sheet-content"

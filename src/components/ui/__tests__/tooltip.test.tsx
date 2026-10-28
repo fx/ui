@@ -108,6 +108,21 @@ describe('Tooltip', () => {
     expect(await screen.findByText('Tooltip text')).toBeInTheDocument()
   })
 
+  it('honors the root delay on its trigger', async () => {
+    const user = userEvent.setup()
+    render(
+      <TooltipProvider>
+        <Tooltip delayDuration={200}>
+          <TooltipTrigger>Delayed</TooltipTrigger>
+          <TooltipContent>Delayed tip</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>,
+    )
+    await user.hover(screen.getByText('Delayed'))
+    expect(screen.queryByText('Delayed tip')).not.toBeInTheDocument()
+    expect(await screen.findByText('Delayed tip')).toBeInTheDocument()
+  })
+
   it('merges custom className on trigger', () => {
     render(
       <TooltipProvider>

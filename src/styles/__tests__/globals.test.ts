@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { compile } from '@tailwindcss/node'
 import { describe, expect, it } from 'vitest'
 import packageJson from '../../../package.json'
 
@@ -37,6 +38,24 @@ function referencedPackages(): string[] {
 }
 
 describe('globals.css', () => {
+  it('registers imported theme tokens, typography, and animations in Tailwind', async () => {
+    const compiler = await compile('@import "./src/styles/globals.css";', {
+      base: join(here, '../../..'),
+      onDependency() {},
+    })
+    const css = compiler.build([
+      'bg-primary',
+      'prose',
+      'animate-collapsible-down',
+      'motion-reduce:transition-none',
+    ])
+    expect(css).toContain('background-color: var(--primary)')
+    expect(css).toContain('.prose')
+    expect(css).toContain('collapsible-down')
+    expect(css).toContain('prefers-reduced-motion: reduce')
+    expect(css).toContain('transition-property: none')
+  })
+
   it('references at least one external package', () => {
     // Guards the guard: a regex that silently stops matching would otherwise
     // turn this suite into a no-op.

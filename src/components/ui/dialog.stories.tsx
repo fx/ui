@@ -12,6 +12,11 @@ import {
 } from './dialog'
 
 const meta: Meta<typeof Dialog> = {
+  parameters: {
+    docs: {
+      description: { component: 'Popup transitions respect the reduced motion preference.' },
+    },
+  },
   title: 'Overlay/Dialog',
   component: Dialog,
 }

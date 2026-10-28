@@ -88,6 +88,7 @@ export {
   ComboboxChips,
   type ComboboxChipsProps,
   ComboboxContent,
+  type ComboboxContentProps,
   type ComboboxContextValue,
   ComboboxEmpty,
   ComboboxGroup,

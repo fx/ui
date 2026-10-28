@@ -20,6 +20,7 @@
         "@biomejs/biome": "^2.3.13",
         "@storybook/react": "10.2.13",
         "@storybook/react-vite": "10.2.13",
+        "@tailwindcss/node": "^4",
         "@tailwindcss/vite": "^4",
         "@testing-library/jest-dom": "^6.9",
         "@testing-library/react": "^16",
@@ -43,6 +44,9 @@
         "react-dom": "^19",
       },
     },
+  },
+  "patchedDependencies": {
+    "@base-ui-components/react@1.0.0-rc.0": "patches/@base-ui-components%2Freact@1.0.0-rc.0.patch",
   },
   "packages": {
     "@acemir/cssom": ["@acemir/cssom@0.9.31", "", {}, "sha512-ZnR3GSaH+/vJ0YlHau21FjfLYjMpYVIzTD8M8vIEQvIGxeOXyXdzCI140rrCY862p/C/BbzWsjc1dgnM9mkoTA=="],

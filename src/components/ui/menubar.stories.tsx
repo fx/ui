@@ -9,6 +9,11 @@ import {
 } from './menubar'
 
 const meta: Meta<typeof Menubar> = {
+  parameters: {
+    docs: {
+      description: { component: 'Popup transitions respect the reduced motion preference.' },
+    },
+  },
   title: 'Overlay/Menubar',
   component: Menubar,
 }

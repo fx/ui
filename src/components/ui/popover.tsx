@@ -49,7 +49,7 @@ function PopoverContent({
         <BasePopover.Popup
           data-slot="popover-content"
           className={cn(
-            'z-[60] w-72 border bg-popover p-4 text-popover-foreground shadow-md outline-none transition-all duration-200',
+            'z-[60] w-72 border bg-popover p-4 text-popover-foreground shadow-md outline-none transition-all duration-200 motion-reduce:transition-none',
             'data-[starting-style]:opacity-0 data-[starting-style]:scale-95',
             'data-[ending-style]:opacity-0 data-[ending-style]:scale-95',
             className,
