@@ -12,7 +12,14 @@ const run = (command, args, cwd = fixture) =>
 
 try {
   run('npm', ['pack', '--ignore-scripts', '--pack-destination', fixture], root)
-  const { version } = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'))
+  const { version, patchedDependencies } = JSON.parse(
+    await readFile(join(root, 'package.json'), 'utf8'),
+  )
+  assert.deepEqual(
+    Object.keys(patchedDependencies ?? {}),
+    ['@base-ui-components/react@1.0.0-rc.0'],
+    'Review bundling when patched dependencies change',
+  )
   const tarballs = (await readdir(fixture)).filter((name) => name.endsWith('.tgz'))
   assert.deepEqual(tarballs, [`fx-ui-${version}.tgz`])
   const [packed] = tarballs
@@ -26,7 +33,15 @@ try {
   )
   run('npm', ['install', '--ignore-scripts', '--no-package-lock', '--no-audit', '--no-fund'])
   const files = await readdir(join(destination, 'dist'))
-  assert.deepEqual(files.sort(), ['index.cjs', 'index.d.cts', 'index.d.ts', 'index.js', 'styles'])
+  assert.equal(files.filter((file) => /^base-ui-.*\.js$/.test(file)).length, 1)
+  assert.equal(files.filter((file) => /^base-ui-.*\.cjs$/.test(file)).length, 1)
+  assert.deepEqual(files.filter((file) => !file.startsWith('base-ui-')).sort(), [
+    'index.cjs',
+    'index.d.cts',
+    'index.d.ts',
+    'index.js',
+    'styles',
+  ])
 
   await writeFile(
     join(fixture, 'esm.mjs'),
@@ -51,7 +66,17 @@ try {
     'typescript@5.9.3',
     'vite@7.3.1',
     '@tailwindcss/vite@4.2.1',
+    '@testing-library/react@16',
+    '@testing-library/user-event@14',
+    'jsdom@27',
   ])
+
+  await writeFile(
+    join(fixture, 'accessibility.mjs'),
+    await readFile(join(root, 'scripts/test-packed-accessibility.mjs')),
+  )
+  run(process.execPath, ['accessibility.mjs', 'esm'])
+  run(process.execPath, ['accessibility.mjs', 'cjs'])
 
   await writeFile(
     join(fixture, 'consumer.mts'),

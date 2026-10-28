@@ -26,8 +26,15 @@ export default defineConfig({
       fileName: (format) => `index.${format === 'es' ? 'js' : 'cjs'}`,
     },
     rollupOptions: {
-      external: (id) => !id.startsWith('.') && !id.startsWith('/') && !id.startsWith('@/'),
+      external: (id) =>
+        !id.startsWith('@base-ui-components/react') &&
+        !id.startsWith('.') &&
+        !id.startsWith('/') &&
+        !id.startsWith('@/'),
       output: {
+        manualChunks(id) {
+          if (id.includes('/node_modules/@base-ui-components/react/')) return 'base-ui'
+        },
         globals: {
           react: 'React',
           'react-dom': 'ReactDOM',
