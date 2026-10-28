@@ -102,14 +102,10 @@ void [ui.Button, props]
   run(join(fixture, 'node_modules/.bin/tsc'), ['-p', 'tsconfig-bundler.json'])
 
   await mkdir(join(fixture, 'src'))
-  await writeFile(
-    join(fixture, 'src/index.css'),
-    `@import '@fx/ui/styles/globals.css' source(none);
-@source './';
-@source '../index.html';
-@source '../node_modules/@fx/ui/dist/index.js';
-`,
-  )
+  const readme = await readFile(join(root, 'README.md'), 'utf8')
+  const recipe = readme.match(/### 1\. Create your app CSS entrypoint[\s\S]*?```css\n([\s\S]*?)```/)
+  assert.ok(recipe, 'Missing documented CSS recipe')
+  await writeFile(join(fixture, 'src/index.css'), recipe[1])
   await writeFile(
     join(fixture, 'src/main.js'),
     "import './index.css'\nimport { buttonVariants } from '@fx/ui'\nconsole.log(buttonVariants({ variant: 'destructive', size: 'icon-lg' }))\n",
@@ -138,6 +134,8 @@ void [ui.Button, props]
   ]) {
     assert.ok(output.includes(token), `Missing generated CSS: ${token}`)
   }
+  assert.ok(!output.includes('hsl(var(--primary))'), 'Invalid nested theme color')
+  assert.ok(output.includes('background-color:var(--primary)'), 'Missing usable primary background')
   assert.ok(!output.includes('.prose'), 'Unexpected typography utilities')
   assert.deepEqual(
     transform({ filename: 'consumer.css', code: css, errorRecovery: true }).warnings,

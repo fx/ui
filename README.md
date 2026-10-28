@@ -40,46 +40,6 @@ Create a CSS file (e.g. `src/index.css`) with the following:
    utilities used only inside pre-compiled components are never generated. */
 @source '../node_modules/@fx/ui/dist/index.js';
 
-/* Required: re-register theme tokens. Tailwind v4 does not propagate
-   @theme inline blocks through @import, so the tokens defined in
-   globals.css must be declared again in the consumer.
-
-   The published globals.css uses HSL channel values (e.g. "0 0% 100%"),
-   so color tokens need hsl() wrappers here. */
-@theme {
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-  --color-chart-1: hsl(var(--chart-1));
-  --color-chart-2: hsl(var(--chart-2));
-  --color-chart-3: hsl(var(--chart-3));
-  --color-chart-4: hsl(var(--chart-4));
-  --color-chart-5: hsl(var(--chart-5));
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --font-sans: 'JetBrains Mono', monospace;
-  --font-mono: 'JetBrains Mono', monospace;
-  --animate-collapsible-down: collapsible-down 0.2s ease-out;
-  --animate-collapsible-up: collapsible-up 0.2s ease-out;
-}
 ```
 
 ### 2. Import it in your app entry
@@ -89,7 +49,7 @@ Create a CSS file (e.g. `src/index.css`) with the following:
 import './index.css'
 ```
 
-> **Why not just `import '@fx/ui/styles/globals.css'` directly?** You can, but Tailwind v4 won't resolve the `@theme inline` tokens or scan the compiled component classes. Components will render but utility classes like `bg-primary` will be missing, and buttons/inputs may appear unstyled.
+> **Why not just `import '@fx/ui/styles/globals.css'` directly?** The imported stylesheet supplies the theme tokens, but Tailwind also needs to scan the compiled component classes. Use the entrypoint above to include those classes and your application's sources.
 
 ### 3. Use components
 
