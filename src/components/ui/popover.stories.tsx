@@ -3,6 +3,11 @@ import { Button } from './button'
 import { Popover, PopoverContent, PopoverTrigger } from './popover'
 
 const meta: Meta<typeof Popover> = {
+  parameters: {
+    docs: {
+      description: { component: 'Popup transitions respect the reduced motion preference.' },
+    },
+  },
   title: 'Overlay/Popover',
   component: Popover,
 }

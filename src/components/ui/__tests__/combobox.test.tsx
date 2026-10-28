@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createRef } from 'react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
   Combobox,
   ComboboxAnchor,
@@ -20,6 +20,8 @@ import {
   ComboboxTrigger,
   useComboboxContext,
 } from '../combobox'
+import { Dialog, DialogContent, DialogTitle } from '../dialog'
+import { Sheet, SheetContent, SheetTitle } from '../sheet'
 
 /** Query helper: find an element by its data-slot attribute */
 function getBySlot(slot: string): HTMLElement {
@@ -40,6 +42,160 @@ const fruits: Fruit[] = [
 ]
 
 describe('Combobox', () => {
+  it('keeps non-portaled content within its container and supports keyboard selection', async () => {
+    const user = userEvent.setup()
+    const onValueChange = vi.fn()
+    render(
+      <div data-testid="container">
+        <Combobox items={fruits} onValueChange={onValueChange}>
+          <ComboboxAnchor>
+            <ComboboxInput aria-label="Fruit" />
+          </ComboboxAnchor>
+          <ComboboxContent portal={false}>
+            <ComboboxList>
+              {(item: Fruit) => (
+                <ComboboxItem key={item.value} value={item}>
+                  {item.label}
+                </ComboboxItem>
+              )}
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>
+      </div>,
+    )
+    const input = screen.getByRole('combobox', { name: 'Fruit' })
+    await user.click(input)
+    await user.keyboard('{ArrowDown}')
+    const list = await screen.findByRole('listbox')
+    expect(screen.getByTestId('container')).toContainElement(list)
+    expect(input).toHaveAttribute('aria-expanded', 'true')
+    expect(input).toHaveAttribute('aria-activedescendant')
+    await user.keyboard('{Enter}')
+    expect(onValueChange).toHaveBeenCalledWith(
+      expect.objectContaining({ label: 'Apple' }),
+      expect.anything(),
+    )
+  })
+
+  it('portals content to the body by default', async () => {
+    const user = userEvent.setup()
+    render(
+      <div data-testid="container">
+        <Combobox items={fruits}>
+          <ComboboxAnchor>
+            <ComboboxInput aria-label="Fruit" />
+          </ComboboxAnchor>
+          <ComboboxContent>
+            <ComboboxList>
+              {(item: Fruit) => (
+                <ComboboxItem key={item.value} value={item}>
+                  {item.label}
+                </ComboboxItem>
+              )}
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>
+      </div>,
+    )
+    await user.click(screen.getByRole('combobox'))
+    expect(screen.getByTestId('container')).not.toContainElement(await screen.findByRole('listbox'))
+  })
+
+  it('keeps the associated label exposed while a local list in a sheet is open', async () => {
+    const user = userEvent.setup()
+    render(
+      <Sheet defaultOpen>
+        <SheetContent>
+          <SheetTitle>Pick a fruit</SheetTitle>
+          <label htmlFor="fruit-input">Fruit</label>
+          <Combobox items={fruits}>
+            <ComboboxAnchor>
+              <ComboboxInput id="fruit-input" />
+            </ComboboxAnchor>
+            <ComboboxContent portal={false}>
+              <ComboboxList>
+                {(item: Fruit) => (
+                  <ComboboxItem key={item.value} value={item}>
+                    {item.label}
+                  </ComboboxItem>
+                )}
+              </ComboboxList>
+            </ComboboxContent>
+          </Combobox>
+        </SheetContent>
+      </Sheet>,
+    )
+    const input = screen.getByRole('combobox', { name: 'Fruit' })
+    const label = screen.getByText('Fruit')
+    await user.click(input)
+    expect(await screen.findByRole('listbox')).toBeInTheDocument()
+    expect(label.closest('[aria-hidden="true"]')).toBeNull()
+    expect(input).toHaveAccessibleName('Fruit')
+    await user.keyboard('{ArrowDown}{Escape}')
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(input).toHaveFocus()
+    expect(label.closest('[aria-hidden="true"]')).toBeNull()
+  })
+
+  it('preserves aria-labelledby references while a portaled list is open', async () => {
+    const user = userEvent.setup()
+    render(
+      <div>
+        <span id="fruit-label">Choose fruit</span>
+        <Combobox items={fruits}>
+          <ComboboxAnchor>
+            <ComboboxInput aria-labelledby="fruit-label" />
+          </ComboboxAnchor>
+          <ComboboxContent>
+            <ComboboxList>
+              {(item: Fruit) => (
+                <ComboboxItem key={item.value} value={item}>
+                  {item.label}
+                </ComboboxItem>
+              )}
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>
+      </div>,
+    )
+    const input = screen.getByRole('combobox', { name: 'Choose fruit' })
+    const label = screen.getByText('Choose fruit')
+    await user.click(input)
+    expect(await screen.findByRole('listbox')).toBeInTheDocument()
+    expect(label.closest('[aria-hidden="true"]')).toBeNull()
+    expect(input).toHaveAccessibleName('Choose fruit')
+  })
+
+  it('closes the list before the enclosing dialog on Escape', async () => {
+    const user = userEvent.setup()
+    render(
+      <Dialog defaultOpen>
+        <DialogContent>
+          <DialogTitle>Choose fruit</DialogTitle>
+          <Combobox items={fruits}>
+            <ComboboxAnchor>
+              <ComboboxInput aria-label="Fruit" />
+            </ComboboxAnchor>
+            <ComboboxContent portal={false}>
+              <ComboboxList>
+                {(item: Fruit) => (
+                  <ComboboxItem key={item.value} value={item}>
+                    {item.label}
+                  </ComboboxItem>
+                )}
+              </ComboboxList>
+            </ComboboxContent>
+          </Combobox>
+        </DialogContent>
+      </Dialog>,
+    )
+    await user.click(screen.getByRole('combobox'))
+    expect(await screen.findByRole('listbox')).toBeInTheDocument()
+    await user.keyboard('{Escape}')
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+  })
+
   it('renders an input', () => {
     render(
       <Combobox items={fruits}>

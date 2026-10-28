@@ -51,6 +51,8 @@ import './index.css'
 
 > **Why not just `import '@fx/ui/styles/globals.css'` directly?** The imported stylesheet supplies the theme tokens, but Tailwind also needs to scan the compiled component classes. Use the entrypoint above to include those classes and your application's sources.
 
+> Process this CSS with Tailwind; importing it as plain browser CSS does not compile its directives. Theme tokens, typography, fonts, and animation utilities are registered by the shared stylesheet. The `@source` directive includes the compiled component classes.
+
 ### 3. Use components
 
 ```tsx

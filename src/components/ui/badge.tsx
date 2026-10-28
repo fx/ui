@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority'
-import type * as React from 'react'
+import * as React from 'react'
 import { Slot } from '@/lib/slot'
 import { cn } from '@/lib/utils'
 
@@ -33,15 +33,16 @@ interface BadgeProps
 }
 
 function Badge({ className, variant, asChild, children, ...props }: BadgeProps) {
+  const classes = cn(badgeVariants({ variant }), className)
   if (asChild) {
     return (
-      <Slot data-slot="badge" className={cn(badgeVariants({ variant }), className)} {...props}>
-        {children as React.ReactElement<Record<string, unknown>>}
+      <Slot data-slot="badge" className={classes} {...props}>
+        {React.Children.only(children) as React.ReactElement<Record<string, unknown>>}
       </Slot>
     )
   }
   return (
-    <span data-slot="badge" className={cn(badgeVariants({ variant }), className)} {...props}>
+    <span data-slot="badge" className={classes} {...props}>
       {children}
     </span>
   )

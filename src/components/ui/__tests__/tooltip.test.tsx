@@ -108,7 +108,7 @@ describe('Tooltip', () => {
     expect(await screen.findByText('Tooltip text')).toBeInTheDocument()
   })
 
-  it('honors the tooltip delay duration', async () => {
+  it('honors the root delay on its trigger', async () => {
     const user = userEvent.setup()
     render(
       <TooltipProvider>

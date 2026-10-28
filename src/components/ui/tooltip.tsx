@@ -36,7 +36,7 @@ function TooltipTrigger({ className, asChild, children, ...props }: TooltipTrigg
     return (
       <BaseTooltip.Trigger
         data-slot="tooltip-trigger"
-        {...(delay === undefined ? {} : { delay })}
+        {...(delay !== undefined ? { delay } : {})}
         className={cn(className)}
         render={child}
         {...props}
@@ -47,7 +47,7 @@ function TooltipTrigger({ className, asChild, children, ...props }: TooltipTrigg
   return (
     <BaseTooltip.Trigger
       data-slot="tooltip-trigger"
-      {...(delay === undefined ? {} : { delay })}
+      {...(delay !== undefined ? { delay } : {})}
       className={cn(className)}
       {...props}
     >
@@ -68,7 +68,7 @@ function TooltipContent({
         <BaseTooltip.Popup
           data-slot="tooltip-content"
           className={cn(
-            'z-[60] overflow-hidden bg-primary px-3 py-1.5 text-xs text-primary-foreground text-balance transition-all duration-200',
+            'z-[60] overflow-hidden bg-primary px-3 py-1.5 text-xs text-primary-foreground text-balance transition-all duration-200 motion-reduce:transition-none',
             'data-[starting-style]:opacity-0 data-[starting-style]:scale-95',
             'data-[ending-style]:opacity-0 data-[ending-style]:scale-95',
             className,

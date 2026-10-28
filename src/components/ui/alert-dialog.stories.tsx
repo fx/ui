@@ -13,6 +13,11 @@ import {
 import { Button } from './button'
 
 const meta: Meta<typeof AlertDialog> = {
+  parameters: {
+    docs: {
+      description: { component: 'Popup transitions respect the reduced motion preference.' },
+    },
+  },
   title: 'Overlay/AlertDialog',
   component: AlertDialog,
 }

@@ -33,7 +33,7 @@ function Checkbox({
     <BaseCheckbox.Root
       data-slot="checkbox"
       data-state={dataState}
-      {...(controlledChecked === undefined ? {} : { checked: controlledChecked })}
+      {...(controlledChecked !== undefined ? { checked: controlledChecked } : {})}
       defaultChecked={defaultChecked}
       indeterminate={indeterminate}
       onCheckedChange={handleCheckedChange}

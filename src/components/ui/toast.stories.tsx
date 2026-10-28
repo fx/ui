@@ -58,5 +58,13 @@ export default meta
 type Story = StoryObj<typeof ToastRoot>
 
 export const Default: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'The viewport lets pointer events pass through empty space while notifications remain interactive.',
+      },
+    },
+  },
   render: () => <ToastStory />,
 }

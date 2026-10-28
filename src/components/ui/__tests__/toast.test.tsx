@@ -49,6 +49,20 @@ describe('Toast', () => {
     expect(screen.getByTestId('viewport').className).toContain('custom-viewport')
   })
 
+  it('lets pointer events pass through the viewport while keeping toast controls interactive', () => {
+    render(
+      <ToastProvider>
+        <ToastViewport data-testid="viewport">
+          <ToastRoot toast={mockToast} data-testid="toast">
+            <ToastClose />
+          </ToastRoot>
+        </ToastViewport>
+      </ToastProvider>,
+    )
+    expect(screen.getByTestId('viewport')).toHaveClass('pointer-events-none')
+    expect(screen.getByTestId('toast')).toHaveClass('pointer-events-auto')
+  })
+
   it('renders ToastTitle with data-slot', () => {
     render(
       <ToastProvider>

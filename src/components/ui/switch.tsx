@@ -65,7 +65,7 @@ function Switch({
     <BaseSwitch.Root
       data-slot="switch"
       data-state={dataState}
-      {...(controlledChecked === undefined ? {} : { checked: controlledChecked })}
+      {...(controlledChecked !== undefined ? { checked: controlledChecked } : {})}
       defaultChecked={defaultChecked}
       onCheckedChange={handleCheckedChange}
       className={cn(switchVariants({ size }), className)}
