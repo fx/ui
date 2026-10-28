@@ -4,7 +4,13 @@ import { Button, type ButtonProps } from './button'
 
 type ThemeToggleProps = Omit<
   ButtonProps,
-  'children' | 'onClick' | 'aria-label' | 'asChild' | 'render' | 'nativeButton'
+  | 'children'
+  | 'dangerouslySetInnerHTML'
+  | 'onClick'
+  | 'aria-label'
+  | 'asChild'
+  | 'render'
+  | 'nativeButton'
 >
 
 function ThemeToggle({ variant = 'ghost', size = 'icon', ...props }: ThemeToggleProps) {

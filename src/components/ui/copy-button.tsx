@@ -4,7 +4,13 @@ import { Button, type ButtonProps } from './button'
 
 type CopyButtonProps = Omit<
   ButtonProps,
-  'children' | 'onClick' | 'aria-label' | 'asChild' | 'render' | 'nativeButton'
+  | 'children'
+  | 'dangerouslySetInnerHTML'
+  | 'onClick'
+  | 'aria-label'
+  | 'asChild'
+  | 'render'
+  | 'nativeButton'
 > & {
   text: string
 }
