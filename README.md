@@ -28,12 +28,15 @@ bun add @fx/ui
 Create a CSS file (e.g. `src/index.css`) with the following:
 
 ```css
-@import '@fx/ui/styles/globals.css';
+@import '@fx/ui/styles/globals.css' source(none);
 
-/* Required: tell Tailwind to scan @fx/ui's compiled output for utility
+/* Scan this app's source files; adjust the path for your project. */
+@source './';
+
+/* Required: tell Tailwind to scan @fx/ui's compiled ESM entry for utility
    classes (bg-primary, text-muted-foreground, etc.). Without this,
    utilities used only inside pre-compiled components are never generated. */
-@source '../node_modules/@fx/ui/dist';
+@source '../node_modules/@fx/ui/dist/index.js';
 
 /* Required: re-register theme tokens. Tailwind v4 does not propagate
    @theme inline blocks through @import, so the tokens defined in
