@@ -35,3 +35,15 @@ export const ConstrainedWidth: Story = {
     )
   },
 }
+
+export const Dark: Story = {
+  args: { legend: 'Dates', value: { from: '', to: '' }, onChange: () => {} },
+  render: (args) => {
+    const [value, setValue] = React.useState(args.value)
+    return (
+      <div className="dark bg-background text-foreground p-4">
+        <DateRangeFields {...args} value={value} onChange={setValue} />
+      </div>
+    )
+  },
+}

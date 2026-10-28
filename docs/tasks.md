@@ -13,3 +13,4 @@ Catch-all task list for work not tracked in a specific [change document](changes
 - [x] Improve overlay accessibility, local combobox content, stylesheet integration guidance, and declaration correctness.
 - [x] Add an accessible Slider with scalar and range values, keyboard support, stories, and runtime/type tests.
 - [x] Keep date range fields usable in constrained layouts.
+- [x] Match native date input controls to the active theme.

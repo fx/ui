@@ -53,6 +53,7 @@ function DateRangeFields({
           </span>
           <Input
             id={fromId}
+            className="scheme-light dark:scheme-dark"
             aria-labelledby={`${legendId} ${fromLabelId}`}
             type="date"
             value={value.from}
@@ -67,6 +68,7 @@ function DateRangeFields({
           </span>
           <Input
             id={toId}
+            className="scheme-light dark:scheme-dark"
             aria-labelledby={`${legendId} ${toLabelId}`}
             type="date"
             value={value.to}
