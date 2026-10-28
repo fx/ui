@@ -30,8 +30,10 @@ Create a CSS file (e.g. `src/index.css`) with the following:
 ```css
 @import '@fx/ui/styles/globals.css' source(none);
 
-/* Scan this app's source files; adjust the path for your project. */
+/* Scan the app's source files and root HTML; add or adjust paths to cover
+   all templates and source files in your project. Paths are relative to this CSS file. */
 @source './';
+@source '../index.html';
 
 /* Required: tell Tailwind to scan @fx/ui's compiled ESM entry for utility
    classes (bg-primary, text-muted-foreground, etc.). Without this,

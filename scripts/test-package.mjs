@@ -85,6 +85,7 @@ void [ui.Button, props]
     join(fixture, 'src/index.css'),
     `@import '@fx/ui/styles/globals.css' source(none);
 @source './';
+@source '../index.html';
 @source '../node_modules/@fx/ui/dist/index.js';
 `,
   )
@@ -94,7 +95,7 @@ void [ui.Button, props]
   )
   await writeFile(
     join(fixture, 'index.html'),
-    '<script type="module" src="/src/main.js"></script>\n',
+    '<div class="bg-[#123456]"></div><script type="module" src="/src/main.js"></script>\n',
   )
   await writeFile(
     join(fixture, 'vite.config.mjs'),
@@ -107,6 +108,7 @@ void [ui.Button, props]
   const css = await readFile(join(assets, cssName))
   const output = css.toString()
   for (const token of [
+    'bg-\\[\\#123456\\]',
     'bg-destructive',
     'hover\\:bg-destructive',
     'size-10',
