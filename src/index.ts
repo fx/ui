@@ -117,7 +117,13 @@ export {
   useComboboxContext,
 } from './components/ui/combobox'
 export { CommandBlock, type CommandBlockProps } from './components/ui/command-block'
+export { ConfirmDialog, type ConfirmDialogProps } from './components/ui/confirm-dialog'
 export { CopyButton, type CopyButtonProps } from './components/ui/copy-button'
+export {
+  DateRangeFields,
+  type DateRangeFieldsProps,
+  type DateRangeValue,
+} from './components/ui/date-range-fields'
 export {
   Dialog,
   DialogClose,
