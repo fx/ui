@@ -116,6 +116,8 @@ export {
   comboboxTriggerVariants,
   useComboboxContext,
 } from './components/ui/combobox'
+export { CommandBlock, type CommandBlockProps } from './components/ui/command-block'
+export { CopyButton, type CopyButtonProps } from './components/ui/copy-button'
 export {
   Dialog,
   DialogClose,
@@ -233,6 +235,7 @@ export {
   type TableRowProps,
 } from './components/ui/table'
 export { Textarea, type TextareaProps } from './components/ui/textarea'
+export { ThemeToggle, type ThemeToggleProps } from './components/ui/theme-toggle'
 export {
   ToastClose,
   ToastDescription,
