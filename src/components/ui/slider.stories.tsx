@@ -36,10 +36,17 @@ export const ControlledScalar: Story = {
 
 function ControlledArrayExample() {
   const [value, setValue] = useState([40])
+  const [committed, setCommitted] = useState([40])
   return (
     <div className="flex w-72 flex-col gap-4">
-      <Slider aria-label="Value" value={value} onValueChange={setValue} />
+      <Slider
+        aria-label="Value"
+        value={value}
+        onValueChange={setValue}
+        onValueCommitted={setCommitted}
+      />
       <output>{value.join(', ')}</output>
+      <output aria-label="Committed value">Committed: {committed.join(', ')}</output>
     </div>
   )
 }

@@ -77,6 +77,38 @@ describe('Slider public types', () => {
     assertType<SliderProps<number[]>>({ defaultValue: [20] })
   })
 
+  it('preserves single-element array inference in both callbacks and modes', () => {
+    const values: readonly number[] = [40]
+    assertType(
+      <Slider
+        defaultValue={values}
+        onValueChange={(value) => expectTypeOf(value).toEqualTypeOf<readonly number[]>()}
+        onValueCommitted={(value) => expectTypeOf(value).toEqualTypeOf<readonly number[]>()}
+      />,
+    )
+    assertType(
+      <Slider
+        value={values}
+        onValueChange={(value) => expectTypeOf(value).toEqualTypeOf<readonly number[]>()}
+        onValueCommitted={(value) => expectTypeOf(value).toEqualTypeOf<readonly number[]>()}
+      />,
+    )
+    assertType(
+      <Slider
+        value={[40]}
+        onValueChange={(value) => expectTypeOf(value).toEqualTypeOf<number[]>()}
+        onValueCommitted={(value) => expectTypeOf(value).toEqualTypeOf<number[]>()}
+      />,
+    )
+    assertType(
+      <Slider
+        defaultValue={[40]}
+        onValueChange={(value) => expectTypeOf(value).toEqualTypeOf<number[]>()}
+        onValueCommitted={(value) => expectTypeOf(value).toEqualTypeOf<number[]>()}
+      />,
+    )
+  })
+
   it('exposes thumb accessibility functions, root state classes and div refs', () => {
     expectTypeOf<SliderProps['getAriaLabel']>().toEqualTypeOf<
       BaseSlider.Thumb.Props['getAriaLabel']

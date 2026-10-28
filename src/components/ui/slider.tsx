@@ -14,12 +14,16 @@ function Slider<Value extends number | readonly number[] = number>({
   className,
   getAriaLabel,
   getAriaValueText,
+  onValueChange,
+  onValueCommitted,
   ...props
 }: SliderProps<Value>) {
   // Like defaultValue itself, an uncontrolled slider's thumb count is initial-only.
   const [defaultThumbCount] = useState(() =>
     Array.isArray(props.defaultValue) ? props.defaultValue.length : 1,
   )
+  const [defaultIsArray] = useState(() => Array.isArray(props.defaultValue))
+  const isArray = props.value === undefined ? defaultIsArray : Array.isArray(props.value)
   const thumbCount =
     props.value === undefined
       ? defaultThumbCount
@@ -27,9 +31,19 @@ function Slider<Value extends number | readonly number[] = number>({
         ? props.value.length
         : 1
 
+  function normalizeValue(value: number | readonly number[]) {
+    // Base UI's pointer path emits a scalar for one thumb, even for array values.
+    // Use the public value shape, including the initial uncontrolled default.
+    return (
+      isArray ? (Array.isArray(value) ? value : [value]) : Array.isArray(value) ? value[0] : value
+    ) as Value extends number ? number : Value
+  }
+
   return (
-    <BaseSlider.Root
+    <BaseSlider.Root<Value>
       {...props}
+      onValueChange={(value, details) => onValueChange?.(normalizeValue(value), details)}
+      onValueCommitted={(value, details) => onValueCommitted?.(normalizeValue(value), details)}
       data-slot="slider"
       className={(state) =>
         cn(

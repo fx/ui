@@ -7,6 +7,138 @@ import { describe, expect, it, vi } from 'vitest'
 import { Slider } from '../slider'
 
 describe('Slider', () => {
+  function pointerControl(container: HTMLElement) {
+    const control = container.querySelector<HTMLElement>('[data-slot="slider-control"]')
+    if (!control) throw new Error('Expected a slider control')
+    // JSDOM has no layout or pointer capture; keep the real Base UI pointer handlers.
+    vi.spyOn(control, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 0, 100, 20))
+    control.hasPointerCapture = () => false
+    return control
+  }
+
+  describe.each(['controlled', 'uncontrolled'] as const)('%s pointer input', (mode) => {
+    it.each([
+      { initial: 40, shape: 'scalar' },
+      { initial: [40], shape: 'array' },
+      { initial: Object.freeze([40]), shape: 'readonly array' },
+    ])('preserves $shape changes and commits across click, drag and keyboard', ({ initial }) => {
+      const onValueChange = vi.fn()
+      const onValueCommitted = vi.fn()
+      function Example() {
+        const [value, setValue] = useState<number | readonly number[]>(initial)
+        return (
+          <Slider
+            {...(mode === 'controlled' ? { value } : { defaultValue: initial })}
+            aria-label="Value"
+            onValueChange={(next, details) => {
+              onValueChange(next, details)
+              if (mode === 'controlled') setValue(next)
+            }}
+            onValueCommitted={onValueCommitted}
+          />
+        )
+      }
+      const { container } = render(<Example />)
+      const control = pointerControl(container)
+      const expected = (value: number) => (Array.isArray(initial) ? [value] : value)
+      fireEvent.pointerDown(control, { button: 0, clientX: 75, clientY: 10 })
+      fireEvent.pointerUp(control, { button: 0, clientX: 75, clientY: 10 })
+      expect(onValueChange).toHaveBeenLastCalledWith(
+        expected(75),
+        expect.objectContaining({
+          reason: 'track-press',
+          activeThumbIndex: 0,
+          event: expect.objectContaining({ type: 'pointerdown', clientX: 75 }),
+          cancel: expect.any(Function),
+          allowPropagation: expect.any(Function),
+        }),
+      )
+      expect(onValueCommitted).toHaveBeenLastCalledWith(
+        expected(75),
+        expect.objectContaining({
+          reason: 'track-press',
+          event: expect.objectContaining({ type: 'pointerup', clientX: 75 }),
+        }),
+      )
+      expect(screen.getByRole('slider')).toHaveValue('75')
+
+      fireEvent.pointerDown(control, { button: 0, clientX: 75, clientY: 10 })
+      fireEvent.pointerMove(control, { buttons: 1, clientX: 60, clientY: 10 })
+      fireEvent.pointerUp(control, { button: 0, clientX: 60, clientY: 10 })
+      expect(onValueChange).toHaveBeenLastCalledWith(
+        expected(60),
+        expect.objectContaining({ reason: 'drag', activeThumbIndex: 0 }),
+      )
+      expect(onValueCommitted).toHaveBeenLastCalledWith(
+        expected(60),
+        expect.objectContaining({ reason: 'drag' }),
+      )
+      fireEvent.keyDown(screen.getByRole('slider'), { key: 'ArrowRight' })
+      expect(onValueChange).toHaveBeenLastCalledWith(
+        expected(61),
+        expect.objectContaining({ reason: 'keyboard' }),
+      )
+      expect(onValueCommitted).toHaveBeenLastCalledWith(
+        expected(61),
+        expect.objectContaining({ reason: 'keyboard' }),
+      )
+      expect(screen.getByRole('slider')).toHaveValue('61')
+    })
+  })
+
+  it('preserves range arrays on pointer changes', () => {
+    const onValueChange = vi.fn()
+    const { container } = render(
+      <Slider defaultValue={[20, 80]} aria-label="Value" onValueChange={onValueChange} />,
+    )
+    const control = pointerControl(container)
+    fireEvent.pointerDown(control, { button: 0, clientX: 75, clientY: 10 })
+    fireEvent.pointerUp(control, { button: 0, clientX: 75, clientY: 10 })
+    expect(onValueChange).toHaveBeenLastCalledWith(
+      [20, 75],
+      expect.objectContaining({ reason: 'track-press', activeThumbIndex: 1 }),
+    )
+  })
+
+  it('uses the current controlled shape ahead of defaultValue on rerender', () => {
+    const onValueChange = vi.fn()
+    const onValueCommitted = vi.fn()
+    function example(value: number | readonly number[]) {
+      return (
+        <Slider
+          value={value}
+          defaultValue={40}
+          aria-label="Value"
+          onValueChange={onValueChange}
+          onValueCommitted={onValueCommitted}
+        />
+      )
+    }
+    const { container, rerender } = render(example(40))
+    const control = pointerControl(container)
+    for (const value of [40, [40], 40]) {
+      rerender(example(value))
+      fireEvent.pointerDown(control, { button: 0, clientX: 75, clientY: 10 })
+      fireEvent.pointerUp(control, { button: 0, clientX: 75, clientY: 10 })
+      const expected = Array.isArray(value) ? [75] : 75
+      expect(onValueChange).toHaveBeenLastCalledWith(expected, expect.anything())
+      expect(onValueCommitted).toHaveBeenLastCalledWith(expected, expect.anything())
+      expect(screen.getByRole('slider')).toHaveValue('40')
+    }
+  })
+
+  it('retains cancellation for array pointer changes', () => {
+    const onValueChange = vi.fn((_value, details) => details.cancel())
+    const { container } = render(
+      <Slider defaultValue={[40]} aria-label="Value" onValueChange={onValueChange} />,
+    )
+    const control = pointerControl(container)
+    fireEvent.pointerDown(control, { button: 0, clientX: 75, clientY: 10 })
+    fireEvent.pointerUp(control, { button: 0, clientX: 75, clientY: 10 })
+    expect(onValueChange).toHaveBeenCalledWith([75], expect.objectContaining({ isCanceled: true }))
+    expect(screen.getByRole('slider')).toHaveValue('40')
+  })
+
   it('defaults to one named slider at min (or zero)', () => {
     const { rerender } = render(<Slider aria-label="Value" />)
     expect(screen.getByRole('slider', { name: 'Value' })).toHaveValue('0')
