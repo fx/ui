@@ -29,12 +29,13 @@
   },
   "scripts": {
     "build": "vite build && mkdir -p dist/styles && cp src/styles/globals.css dist/styles/globals.css",
-    "test": "vitest run",
+    "test": "vitest run --exclude tests/artifact.test.tsx",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "prepare": "husky",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "test:artifact": "bun run build && vitest run tests/artifact.test.tsx && tsc --noEmit --skipLibCheck --strict --jsx react-jsx --moduleResolution bundler --module esnext --target es2022 tests/artifact-types.tsx"
   },
   "peerDependencies": {
     "react": "^19",
