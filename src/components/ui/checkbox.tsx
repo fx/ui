@@ -19,7 +19,7 @@ function Checkbox({
 
   const dataState = indeterminate ? 'indeterminate' : checked ? 'checked' : 'unchecked'
 
-  const handleCheckedChange: typeof onCheckedChange = useCallback(
+  const handleCheckedChange: NonNullable<typeof onCheckedChange> = useCallback(
     (nextChecked, eventDetails) => {
       if (!isControlled) {
         setUncontrolledChecked(nextChecked)
@@ -33,7 +33,7 @@ function Checkbox({
     <BaseCheckbox.Root
       data-slot="checkbox"
       data-state={dataState}
-      checked={controlledChecked}
+      {...(controlledChecked !== undefined ? { checked: controlledChecked } : {})}
       defaultChecked={defaultChecked}
       indeterminate={indeterminate}
       onCheckedChange={handleCheckedChange}

@@ -3,6 +3,11 @@ import { Button } from './button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip'
 
 const meta: Meta<typeof Tooltip> = {
+  parameters: {
+    docs: {
+      description: { component: 'Popup transitions respect the reduced motion preference.' },
+    },
+  },
   title: 'Overlay/Tooltip',
   component: Tooltip,
 }

@@ -38,7 +38,7 @@ function AlertDialogTrigger({ className, asChild, children, ...props }: AlertDia
 
 const alertDialogContentVariants = cva(
   [
-    'fixed top-[50%] left-[50%] z-50 grid translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-300',
+    'fixed top-[50%] left-[50%] z-50 grid translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-300 motion-reduce:transition-none',
     'data-[starting-style]:opacity-0 data-[starting-style]:scale-95',
     'data-[ending-style]:opacity-0 data-[ending-style]:scale-95',
   ].join(' '),
@@ -73,7 +73,7 @@ function AlertDialogContent({
     <BaseAlertDialog.Portal>
       <BaseAlertDialog.Backdrop
         data-slot="alert-dialog-overlay"
-        className="fixed inset-0 z-50 bg-black/50 transition-all duration-300 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0"
+        className="fixed inset-0 z-50 bg-black/50 transition-all duration-300 motion-reduce:transition-none data-[starting-style]:opacity-0 data-[ending-style]:opacity-0"
       />
       <BaseAlertDialog.Popup
         data-slot="alert-dialog-content"

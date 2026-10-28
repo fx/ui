@@ -46,7 +46,7 @@ function DropdownMenuContent({
         <BaseMenu.Popup
           data-slot="dropdown-menu-content"
           className={cn(
-            'z-[60] min-w-[8rem] overflow-hidden border bg-popover p-1 text-popover-foreground transition-all duration-200',
+            'z-[60] min-w-[8rem] overflow-hidden border bg-popover p-1 text-popover-foreground transition-all duration-200 motion-reduce:transition-none',
             'data-[starting-style]:opacity-0 data-[starting-style]:scale-95',
             'data-[ending-style]:opacity-0 data-[ending-style]:scale-95',
             className,
@@ -135,7 +135,7 @@ function DropdownMenuCheckboxItem({
         'relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8 text-sm outline-none select-none transition-colors data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
         className,
       )}
-      checked={checked}
+      {...(checked !== undefined ? { checked } : {})}
       {...props}
     >
       <span className="absolute left-2 flex size-3.5 items-center justify-center">
@@ -188,7 +188,10 @@ function DropdownMenuRadioItem({
 }
 
 // DropdownMenuSeparator
-function DropdownMenuSeparator({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+function DropdownMenuSeparator({
+  className,
+  ...props
+}: React.ComponentPropsWithRef<typeof BaseMenu.Separator>) {
   return (
     <BaseMenu.Separator
       data-slot="dropdown-menu-separator"
@@ -272,7 +275,7 @@ function DropdownMenuSubContent({
         <BaseMenu.Popup
           data-slot="dropdown-menu-sub-content"
           className={cn(
-            'z-[60] min-w-[8rem] overflow-hidden border bg-popover p-1 text-popover-foreground shadow-lg transition-all duration-200',
+            'z-[60] min-w-[8rem] overflow-hidden border bg-popover p-1 text-popover-foreground shadow-lg transition-all duration-200 motion-reduce:transition-none',
             'data-[starting-style]:opacity-0 data-[starting-style]:scale-95',
             'data-[ending-style]:opacity-0 data-[ending-style]:scale-95',
             className,

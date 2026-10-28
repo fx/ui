@@ -51,7 +51,7 @@ function Switch({
 
   const dataState = checked ? 'checked' : 'unchecked'
 
-  const handleCheckedChange: typeof onCheckedChange = useCallback(
+  const handleCheckedChange: NonNullable<typeof onCheckedChange> = useCallback(
     (nextChecked, eventDetails) => {
       if (!isControlled) {
         setUncontrolledChecked(nextChecked)
@@ -65,7 +65,7 @@ function Switch({
     <BaseSwitch.Root
       data-slot="switch"
       data-state={dataState}
-      checked={controlledChecked}
+      {...(controlledChecked !== undefined ? { checked: controlledChecked } : {})}
       defaultChecked={defaultChecked}
       onCheckedChange={handleCheckedChange}
       className={cn(switchVariants({ size }), className)}
