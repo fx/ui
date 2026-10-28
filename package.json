@@ -79,5 +79,8 @@
     "*.{ts,tsx,js,jsx,json}": [
       "biome check --write --no-errors-on-unmatched"
     ]
+  },
+  "patchedDependencies": {
+    "@base-ui-components/react@1.0.0-rc.0": "patches/@base-ui-components%2Freact@1.0.0-rc.0.patch"
   }
 }

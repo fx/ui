@@ -495,9 +495,10 @@ export const InDialog: Story = {
       <DialogTrigger>Choose fruit</DialogTrigger>
       <DialogContent>
         <DialogTitle>Choose fruit</DialogTitle>
+        <label htmlFor="dialog-fruit">Fruit</label>
         <Combobox items={fruits}>
           <ComboboxAnchor>
-            <ComboboxInput aria-label="Fruit" placeholder="Search fruits..." />
+            <ComboboxInput id="dialog-fruit" placeholder="Search fruits..." />
             <ComboboxTrigger />
           </ComboboxAnchor>
           <ComboboxContent portal={false}>

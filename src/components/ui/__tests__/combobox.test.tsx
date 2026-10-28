@@ -21,6 +21,7 @@ import {
   useComboboxContext,
 } from '../combobox'
 import { Dialog, DialogContent, DialogTitle } from '../dialog'
+import { Sheet, SheetContent, SheetTitle } from '../sheet'
 
 /** Query helper: find an element by its data-slot attribute */
 function getBySlot(slot: string): HTMLElement {
@@ -98,6 +99,71 @@ describe('Combobox', () => {
     )
     await user.click(screen.getByRole('combobox'))
     expect(screen.getByTestId('container')).not.toContainElement(await screen.findByRole('listbox'))
+  })
+
+  it('keeps the associated label exposed while a local list in a sheet is open', async () => {
+    const user = userEvent.setup()
+    render(
+      <Sheet defaultOpen>
+        <SheetContent>
+          <SheetTitle>Pick a fruit</SheetTitle>
+          <label htmlFor="fruit-input">Fruit</label>
+          <Combobox items={fruits}>
+            <ComboboxAnchor>
+              <ComboboxInput id="fruit-input" />
+            </ComboboxAnchor>
+            <ComboboxContent portal={false}>
+              <ComboboxList>
+                {(item: Fruit) => (
+                  <ComboboxItem key={item.value} value={item}>
+                    {item.label}
+                  </ComboboxItem>
+                )}
+              </ComboboxList>
+            </ComboboxContent>
+          </Combobox>
+        </SheetContent>
+      </Sheet>,
+    )
+    const input = screen.getByRole('combobox', { name: 'Fruit' })
+    const label = screen.getByText('Fruit')
+    await user.click(input)
+    expect(await screen.findByRole('listbox')).toBeInTheDocument()
+    expect(label.closest('[aria-hidden="true"]')).toBeNull()
+    expect(input).toHaveAccessibleName('Fruit')
+    await user.keyboard('{ArrowDown}{Escape}')
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(input).toHaveFocus()
+    expect(label.closest('[aria-hidden="true"]')).toBeNull()
+  })
+
+  it('preserves aria-labelledby references while a portaled list is open', async () => {
+    const user = userEvent.setup()
+    render(
+      <div>
+        <span id="fruit-label">Choose fruit</span>
+        <Combobox items={fruits}>
+          <ComboboxAnchor>
+            <ComboboxInput aria-labelledby="fruit-label" />
+          </ComboboxAnchor>
+          <ComboboxContent>
+            <ComboboxList>
+              {(item: Fruit) => (
+                <ComboboxItem key={item.value} value={item}>
+                  {item.label}
+                </ComboboxItem>
+              )}
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>
+      </div>,
+    )
+    const input = screen.getByRole('combobox', { name: 'Choose fruit' })
+    const label = screen.getByText('Choose fruit')
+    await user.click(input)
+    expect(await screen.findByRole('listbox')).toBeInTheDocument()
+    expect(label.closest('[aria-hidden="true"]')).toBeNull()
+    expect(input).toHaveAccessibleName('Choose fruit')
   })
 
   it('closes the list before the enclosing dialog on Escape', async () => {
