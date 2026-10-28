@@ -120,7 +120,7 @@ describe('Tooltip', () => {
     )
     await user.hover(screen.getByText('Delayed'))
     expect(screen.queryByText('Delayed tip')).not.toBeInTheDocument()
-    expect(await screen.findByText('Delayed tip')).toBeInTheDocument()
+    expect(await screen.findByText('Delayed tip', {}, { timeout: 400 })).toBeInTheDocument()
   })
 
   it('merges custom className on trigger', () => {

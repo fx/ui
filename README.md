@@ -28,12 +28,18 @@ bun add @fx/ui
 Create a CSS file (e.g. `src/index.css`) with the following:
 
 ```css
-@import '@fx/ui/styles/globals.css';
+@import '@fx/ui/styles/globals.css' source(none);
 
-/* Required: tell Tailwind to scan @fx/ui's compiled output for utility
+/* Scan the app's source files and root HTML; add or adjust paths to cover
+   all templates and source files in your project. Paths are relative to this CSS file. */
+@source './';
+@source '../index.html';
+
+/* Required: tell Tailwind to scan @fx/ui's compiled ESM entry for utility
    classes (bg-primary, text-muted-foreground, etc.). Without this,
    utilities used only inside pre-compiled components are never generated. */
-@source '../node_modules/@fx/ui/dist';
+@source '../node_modules/@fx/ui/dist/index.js';
+
 ```
 
 ### 2. Import it in your app entry
@@ -42,6 +48,8 @@ Create a CSS file (e.g. `src/index.css`) with the following:
 // src/main.tsx
 import './index.css'
 ```
+
+> **Why not just `import '@fx/ui/styles/globals.css'` directly?** The imported stylesheet supplies the theme tokens, but Tailwind also needs to scan the compiled component classes. Use the entrypoint above to include those classes and your application's sources.
 
 > Process this CSS with Tailwind; importing it as plain browser CSS does not compile its directives. Theme tokens, typography, fonts, and animation utilities are registered by the shared stylesheet. The `@source` directive includes the compiled component classes.
 
@@ -89,6 +97,8 @@ dependency of `@fx/ui`, so no extra install is needed.
 | **Complex** | Toast, Chart |
 
 ## Development
+
+Use Bun to install repository dependencies and maintain the authoritative `bun.lock`. The packed-consumer verification uses npm to test installation of the published package.
 
 ```sh
 bun install          # Install dependencies

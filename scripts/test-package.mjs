@@ -1,0 +1,263 @@
+import assert from 'node:assert/strict'
+import { execFileSync } from 'node:child_process'
+import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { transform } from 'lightningcss'
+import { parseAst } from 'rollup/parseAst'
+
+const root = process.cwd()
+const fixture = await mkdtemp(join(tmpdir(), 'fx-ui-package-test-'))
+const run = (command, args, cwd = fixture) =>
+  execFileSync(command, args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+
+try {
+  run('npm', ['pack', '--ignore-scripts', '--pack-destination', fixture], root)
+  const { version, patchedDependencies, dependencies, peerDependencies } = JSON.parse(
+    await readFile(join(root, 'package.json'), 'utf8'),
+  )
+  assert.deepEqual(
+    Object.keys(patchedDependencies ?? {}),
+    ['@base-ui-components/react@1.0.0-rc.0'],
+    'Review bundling when patched dependencies change',
+  )
+  const tarballs = (await readdir(fixture)).filter((name) => name.endsWith('.tgz'))
+  assert.deepEqual(tarballs, [`fx-ui-${version}.tgz`])
+  const [packed] = tarballs
+  const destination = join(fixture, 'node_modules/@fx/ui')
+  await writeFile(
+    join(fixture, 'package.json'),
+    JSON.stringify({
+      private: true,
+      dependencies: { '@fx/ui': `file:./${packed}`, react: '19.2.4', 'react-dom': '19.2.4' },
+    }),
+  )
+  run('npm', [
+    'install',
+    '--install-strategy=nested',
+    '--install-strategy=nested',
+    '--ignore-scripts',
+    '--no-package-lock',
+    '--no-audit',
+    '--no-fund',
+  ])
+  const files = await readdir(join(destination, 'dist'))
+  assert.equal(files.filter((file) => /^base-ui-.*\.js$/.test(file)).length, 1)
+  assert.equal(files.filter((file) => /^base-ui-.*\.cjs$/.test(file)).length, 1)
+  assert.deepEqual(files.filter((file) => !file.startsWith('base-ui-')).sort(), [
+    'index.cjs',
+    'index.d.cts',
+    'index.d.ts',
+    'index.js',
+    'styles',
+  ])
+
+  const declared = Object.keys({ ...dependencies, ...peerDependencies })
+  function inspectImports(node, file) {
+    if (!node || typeof node !== 'object') return
+    let specifier
+    if (
+      node.type === 'ImportDeclaration' ||
+      node.type === 'ExportNamedDeclaration' ||
+      node.type === 'ExportAllDeclaration'
+    )
+      specifier = node.source?.value
+    if (node.type === 'ImportExpression') specifier = node.source?.value
+    if (node.type === 'CallExpression' && node.callee?.name === 'require')
+      specifier = node.arguments[0]?.value
+    if (
+      typeof specifier === 'string' &&
+      !specifier.startsWith('.') &&
+      !specifier.startsWith('node:')
+    ) {
+      assert.ok(
+        declared.some((name) => specifier === name || specifier.startsWith(`${name}/`)),
+        `${file}: undeclared import ${specifier}`,
+      )
+    }
+    for (const value of Object.values(node)) {
+      if (Array.isArray(value)) for (const child of value) inspectImports(child, file)
+      else if (value && typeof value === 'object') inspectImports(value, file)
+    }
+  }
+  for (const file of files.filter((name) => /\.(js|cjs)$/.test(name))) {
+    inspectImports(parseAst(await readFile(join(destination, 'dist', file), 'utf8')), file)
+  }
+
+  await writeFile(
+    join(fixture, 'esm.mjs'),
+    "import { Button, buttonVariants } from '@fx/ui'; if (!Button || !buttonVariants({variant:'destructive'}).includes('bg-destructive')) throw Error('ESM exports');\n",
+  )
+  await writeFile(
+    join(fixture, 'cjs.cjs'),
+    "const { Button, buttonVariants } = require('@fx/ui'); if (!Button || !buttonVariants({size:'icon-lg'}).includes('size-10')) throw Error('CJS exports');\n",
+  )
+  run(process.execPath, ['esm.mjs'])
+  run(process.execPath, ['cjs.cjs'])
+
+  run('npm', [
+    'install',
+    '--install-strategy=nested',
+    '--ignore-scripts',
+    '--no-package-lock',
+    '--no-audit',
+    '--no-fund',
+    '--no-save',
+    '@types/react@19.2.14',
+    '@types/react-dom@19.2.3',
+    'typescript@5.9.3',
+    'vite@7.3.1',
+    '@tailwindcss/vite@4.2.1',
+    '@testing-library/react@16',
+    '@testing-library/user-event@14',
+    'jsdom@27',
+  ])
+
+  await writeFile(
+    join(fixture, 'accessibility.mjs'),
+    await readFile(join(root, 'scripts/test-packed-accessibility.mjs')),
+  )
+  run(process.execPath, ['accessibility.mjs', 'esm'])
+  run(process.execPath, ['accessibility.mjs', 'cjs'])
+
+  await writeFile(
+    join(fixture, 'consumer.mts'),
+    `import { Button, type ButtonProps, type ChartConfig } from '@fx/ui'
+const props: ButtonProps = { variant: 'destructive', size: 'icon-lg' }
+const chart: ChartConfig = { desktop: { label: 'Desktop', color: '#fff' } }
+// @ts-expect-error unknown button variant
+const bad: ButtonProps = { variant: 'unknown' }
+void [Button, props, chart, bad]
+`,
+  )
+  await writeFile(
+    join(fixture, 'consumer.cts'),
+    `import ui = require('@fx/ui')
+const props: ui.ButtonProps = { variant: 'outline' }
+void [ui.Button, props]
+`,
+  )
+  await writeFile(
+    join(fixture, 'tsconfig.json'),
+    JSON.stringify({
+      compilerOptions: {
+        module: 'NodeNext',
+        moduleResolution: 'NodeNext',
+        target: 'ES2022',
+        strict: true,
+        noEmit: true,
+        skipLibCheck: false,
+      },
+      files: ['consumer.mts', 'consumer.cts'],
+    }),
+  )
+  run(join(fixture, 'node_modules/.bin/tsc'), ['-p', 'tsconfig.json'])
+  await writeFile(
+    join(fixture, 'tsconfig-bundler.json'),
+    JSON.stringify({
+      compilerOptions: {
+        module: 'ESNext',
+        moduleResolution: 'Bundler',
+        target: 'ES2022',
+        strict: true,
+        noEmit: true,
+        skipLibCheck: false,
+      },
+      files: ['consumer.mts'],
+    }),
+  )
+  run(join(fixture, 'node_modules/.bin/tsc'), ['-p', 'tsconfig-bundler.json'])
+
+  // pnpm resolves dependencies from isolated realpaths, unlike npm's nested layout.
+  const isolated = join(fixture, 'pnpm-consumer')
+  await mkdir(isolated)
+  await writeFile(
+    join(isolated, 'package.json'),
+    JSON.stringify({
+      private: true,
+      dependencies: {
+        '@fx/ui': `file:../${packed}`,
+        react: '19.2.4',
+        'react-dom': '19.2.4',
+        '@types/react': '19.2.14',
+        '@types/react-dom': '19.2.3',
+        typescript: '5.9.3',
+      },
+    }),
+  )
+  for (const file of [
+    'consumer.mts',
+    'consumer.cts',
+    'tsconfig.json',
+    'tsconfig-bundler.json',
+    'esm.mjs',
+    'cjs.cjs',
+  ]) {
+    await writeFile(join(isolated, file), await readFile(join(fixture, file)))
+  }
+  run(
+    'npm',
+    [
+      'exec',
+      '--yes',
+      '--package',
+      'pnpm@10.34.9',
+      '--',
+      'pnpm',
+      'install',
+      '--config.node-linker=isolated',
+      '--config.hoist=false',
+      '--ignore-scripts',
+    ],
+    isolated,
+  )
+  const isolatedTsc = join(isolated, 'node_modules/.bin/tsc')
+  run(isolatedTsc, ['-p', 'tsconfig.json'], isolated)
+  run(isolatedTsc, ['-p', 'tsconfig-bundler.json'], isolated)
+  run(process.execPath, ['esm.mjs'], isolated)
+  run(process.execPath, ['cjs.cjs'], isolated)
+
+  await mkdir(join(fixture, 'src'))
+  const readme = await readFile(join(root, 'README.md'), 'utf8')
+  const recipe = readme.match(/### 1\. Create your app CSS entrypoint[\s\S]*?```css\n([\s\S]*?)```/)
+  assert.ok(recipe, 'Missing documented CSS recipe')
+  await writeFile(join(fixture, 'src/index.css'), recipe[1])
+  await writeFile(
+    join(fixture, 'src/main.js'),
+    "import './index.css'\nimport { buttonVariants } from '@fx/ui'\nconsole.log(buttonVariants({ variant: 'destructive', size: 'icon-lg' }))\n",
+  )
+  await writeFile(
+    join(fixture, 'index.html'),
+    '<div class="bg-[#123456]"></div><script type="module" src="/src/main.js"></script>\n',
+  )
+  await writeFile(
+    join(fixture, 'vite.config.mjs'),
+    "import { defineConfig } from 'vite'\nimport tailwindcss from '@tailwindcss/vite'\nexport default defineConfig({ plugins: [tailwindcss()] })\n",
+  )
+  run(join(fixture, 'node_modules/.bin/vite'), ['build'])
+  const assets = join(fixture, 'dist/assets')
+  const cssName = (await readdir(assets)).find((name) => name.endsWith('.css'))
+  assert.ok(cssName)
+  const css = await readFile(join(assets, cssName))
+  const output = css.toString()
+  for (const token of [
+    'bg-\\[\\#123456\\]',
+    'bg-destructive',
+    'hover\\:bg-destructive',
+    'size-10',
+    '[stroke="#ccc"]',
+    '[stroke="#fff"]',
+  ]) {
+    assert.ok(output.includes(token), `Missing generated CSS: ${token}`)
+  }
+  assert.ok(!output.includes('hsl(var(--primary))'), 'Invalid nested theme color')
+  assert.ok(output.includes('background-color:var(--primary)'), 'Missing usable primary background')
+  assert.ok(!output.includes('.prose'), 'Unexpected typography utilities')
+  assert.deepEqual(
+    transform({ filename: 'consumer.css', code: css, errorRecovery: true }).warnings,
+    [],
+  )
+  console.log(`Packed ESM, CJS, NodeNext types, and Tailwind CSS verified (${css.length} bytes)`)
+} finally {
+  await rm(fixture, { recursive: true, force: true })
+}

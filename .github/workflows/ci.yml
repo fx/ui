@@ -35,5 +35,7 @@ jobs:
       - name: Test
         run: bun run test
 
+      - name: Build and verify package
+        run: bun run test:package
       - name: Build and test package artifacts
         run: bun run test:artifact
