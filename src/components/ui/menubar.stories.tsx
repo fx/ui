@@ -35,7 +35,7 @@ export const Default: Story = {
       </MenubarMenu>
       <MenubarMenu>
         <MenubarTrigger>Edit</MenubarTrigger>
-        <MenubarContent>
+        <MenubarContent align="end" sideOffset={8}>
           <MenubarItem>Undo</MenubarItem>
           <MenubarItem>Redo</MenubarItem>
           <MenubarSeparator />

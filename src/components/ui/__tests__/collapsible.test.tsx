@@ -34,7 +34,7 @@ describe('CollapsibleTrigger', () => {
           </CollapsibleTrigger>
         </Collapsible>,
       )
-      const link = screen.getByRole('link', { name: 'Toggle Link' })
+      const link = screen.getByRole('button', { name: 'Toggle Link' })
       expect(link).toBeInTheDocument()
       expect(link.tagName).toBe('A')
       expect(link).toHaveAttribute('href', '/toggle')
@@ -48,7 +48,7 @@ describe('CollapsibleTrigger', () => {
           </CollapsibleTrigger>
         </Collapsible>,
       )
-      const link = screen.getByRole('link', { name: 'Toggle Link' })
+      const link = screen.getByRole('button', { name: 'Toggle Link' })
       expect(link).toHaveAttribute('data-slot', 'collapsible-trigger')
     })
 
@@ -63,6 +63,25 @@ describe('CollapsibleTrigger', () => {
       )
       expect(ref.current).toBeInstanceOf(HTMLAnchorElement)
     })
+  })
+
+  it('honors explicit nativeButton overrides', () => {
+    const { rerender } = render(
+      <Collapsible>
+        <CollapsibleTrigger asChild nativeButton>
+          <button type="button">Toggle</button>
+        </CollapsibleTrigger>
+      </Collapsible>,
+    )
+    expect(screen.getByRole('button')).not.toHaveAttribute('role')
+    rerender(
+      <Collapsible>
+        <CollapsibleTrigger nativeButton={false} render={<div />}>
+          Toggle
+        </CollapsibleTrigger>
+      </Collapsible>,
+    )
+    expect(screen.getByRole('button')).toHaveAttribute('role', 'button')
   })
 
   it('renders a button', () => {
@@ -137,6 +156,21 @@ describe('Collapsible interaction', () => {
     await user.click(screen.getByRole('button', { name: 'Toggle' }))
     // After closing, content should be removed
     expect(screen.queryByText('Panel content')).not.toBeInTheDocument()
+  })
+
+  it('supports keyboard activation of a non-button child', async () => {
+    const user = userEvent.setup()
+    render(
+      <Collapsible>
+        <CollapsibleTrigger asChild>
+          <div>Toggle</div>
+        </CollapsibleTrigger>
+        <CollapsibleContent>Panel content</CollapsibleContent>
+      </Collapsible>,
+    )
+    await user.tab()
+    await user.keyboard('{Enter}')
+    expect(screen.getByText('Panel content')).toBeInTheDocument()
   })
 
   it('supports controlled open state', () => {

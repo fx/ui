@@ -1,6 +1,12 @@
 import { Bar, BarChart, XAxis, YAxis } from 'recharts'
 import type { Meta, StoryObj } from 'storybook'
-import { type ChartConfig, ChartContainer, ChartLegend, ChartTooltip } from './chart'
+import {
+  type ChartConfig,
+  ChartContainer,
+  ChartLegend,
+  ChartTooltip,
+  ChartTooltipContent,
+} from './chart'
 
 const data = [
   { month: 'Jan', desktop: 186, mobile: 80 },
@@ -43,6 +49,30 @@ export const Default: Story = {
         <ChartLegend />
         <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
         <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
+      </BarChart>
+    </ChartContainer>
+  ),
+}
+
+export const FormattedTooltip: Story = {
+  render: () => (
+    <ChartContainer config={config} className="h-64 w-full">
+      <BarChart data={data}>
+        <XAxis dataKey="month" />
+        <ChartTooltip
+          content={
+            <ChartTooltipContent
+              labelFormatter={(label) => `Month: ${label}`}
+              formatter={(value, name) => (
+                <span>
+                  {name}: {value}
+                </span>
+              )}
+            />
+          }
+        />
+        <ChartLegend />
+        <Bar dataKey="desktop" fill="var(--color-desktop)" />
       </BarChart>
     </ChartContainer>
   ),

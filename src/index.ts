@@ -68,6 +68,7 @@ export {
   ChartTooltip,
   ChartTooltipContent,
   type ChartTooltipContentProps,
+  type ChartTooltipPayload,
   type ChartTooltipProps,
 } from './components/ui/chart'
 // Form
@@ -161,6 +162,7 @@ export {
   Menubar,
   MenubarCheckboxItem,
   MenubarContent,
+  type MenubarContentProps,
   MenubarItem,
   MenubarLabel,
   MenubarMenu,
