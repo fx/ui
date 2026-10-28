@@ -15,3 +15,12 @@ export const Default: Story = {
     className: 'w-64',
   },
 }
+
+export const Customized: Story = {
+  args: {
+    value: 45,
+    className: 'w-64',
+    trackClassName: 'h-1 bg-muted',
+    indicatorClassName: 'bg-foreground',
+  },
+}

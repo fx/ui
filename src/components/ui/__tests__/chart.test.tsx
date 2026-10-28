@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { compile } from '@tailwindcss/node'
 import { render, screen } from '@testing-library/react'
 import { Bar, BarChart } from 'recharts'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
   type ChartConfig,
   ChartContainer,
@@ -118,6 +118,36 @@ describe('ChartTooltipContent', () => {
     expect(screen.getByText('Test')).toBeInTheDocument()
     expect(screen.getByText('100')).toBeInTheDocument()
     expect(screen.getByText('Value')).toBeInTheDocument()
+  })
+
+  it('formats numeric labels and zero values with the full payload', () => {
+    const payload = [{ name: 'value', value: 0, dataKey: 'value', payload: { value: 0 } }]
+    const formatter = vi.fn(() => <span>Formatted</span>)
+    const labelFormatter = vi.fn(() => 'Formatted label')
+    render(
+      <ChartContext.Provider value={testConfig}>
+        <ChartTooltipContent
+          active
+          label={0}
+          payload={payload}
+          formatter={formatter}
+          labelFormatter={labelFormatter}
+        />
+      </ChartContext.Provider>,
+    )
+    expect(formatter).toHaveBeenCalledWith(0, 'value', payload[0], 0, payload[0]?.payload)
+    expect(labelFormatter).toHaveBeenCalledWith(0, payload)
+    expect(screen.getByText('Formatted')).toBeInTheDocument()
+    expect(screen.getByText('Formatted label')).toBeInTheDocument()
+  })
+
+  it('renders zero without a formatter', () => {
+    render(
+      <ChartContext.Provider value={testConfig}>
+        <ChartTooltipContent active payload={[{ name: 'value', value: 0 }]} />
+      </ChartContext.Provider>,
+    )
+    expect(screen.getByText('0')).toBeInTheDocument()
   })
 
   it('has data-slot on tooltip content', () => {

@@ -286,4 +286,26 @@ describe('Menubar', () => {
     )
     expect(screen.getByTestId('menubar').className).toContain('custom-class')
   })
+  it('passes positioning options to the positioner, not the popup', () => {
+    render(
+      <Menubar>
+        <MenubarMenu open>
+          <MenubarTrigger>File</MenubarTrigger>
+          <MenubarContent
+            align="end"
+            side="bottom"
+            sideOffset={8}
+            alignOffset={3}
+            data-testid="popup"
+          >
+            <MenubarItem>Item</MenubarItem>
+          </MenubarContent>
+        </MenubarMenu>
+      </Menubar>,
+    )
+    const popup = screen.getByTestId('popup')
+    expect(popup).not.toHaveAttribute('align')
+    expect(popup).not.toHaveAttribute('sideoffset')
+    expect(popup.parentElement).toHaveAttribute('data-align', 'end')
+  })
 })
