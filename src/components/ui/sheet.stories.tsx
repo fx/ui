@@ -13,6 +13,11 @@ import {
 type SheetStoryArgs = { side: SheetContentProps['side'] }
 
 const meta = {
+  parameters: {
+    docs: {
+      description: { component: 'Popup transitions respect the reduced motion preference.' },
+    },
+  },
   title: 'Overlay/Sheet',
   component: Sheet,
   argTypes: {

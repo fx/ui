@@ -89,6 +89,7 @@ export {
   ComboboxChips,
   type ComboboxChipsProps,
   ComboboxContent,
+  type ComboboxContentProps,
   type ComboboxContextValue,
   ComboboxEmpty,
   ComboboxGroup,
@@ -117,6 +118,12 @@ export {
   comboboxTriggerVariants,
   useComboboxContext,
 } from './components/ui/combobox'
+export { ConfirmDialog, type ConfirmDialogProps } from './components/ui/confirm-dialog'
+export {
+  DateRangeFields,
+  type DateRangeFieldsProps,
+  type DateRangeValue,
+} from './components/ui/date-range-fields'
 export {
   Dialog,
   DialogClose,

@@ -15,6 +15,7 @@ import {
   ComboboxSearch,
   ComboboxTrigger,
 } from './combobox'
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from './dialog'
 
 interface Item {
   label: string
@@ -484,5 +485,34 @@ export const WithGroups: Story = {
         </ComboboxContent>
       </Combobox>
     </div>
+  ),
+}
+
+// Local content stays inside the dialog's DOM tree and scroll container.
+export const InDialog: Story = {
+  render: () => (
+    <Dialog>
+      <DialogTrigger>Choose fruit</DialogTrigger>
+      <DialogContent>
+        <DialogTitle>Choose fruit</DialogTitle>
+        <label htmlFor="dialog-fruit">Fruit</label>
+        <Combobox items={fruits}>
+          <ComboboxAnchor>
+            <ComboboxInput id="dialog-fruit" placeholder="Search fruits..." />
+            <ComboboxTrigger />
+          </ComboboxAnchor>
+          <ComboboxContent portal={false}>
+            <ComboboxEmpty />
+            <ComboboxList>
+              {(item: Item) => (
+                <ComboboxItem key={item.value} value={item}>
+                  {item.label}
+                </ComboboxItem>
+              )}
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>
+      </DialogContent>
+    </Dialog>
   ),
 }

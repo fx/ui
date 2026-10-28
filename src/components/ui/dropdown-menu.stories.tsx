@@ -9,6 +9,11 @@ import {
 } from './dropdown-menu'
 
 const meta: Meta<typeof DropdownMenu> = {
+  parameters: {
+    docs: {
+      description: { component: 'Popup transitions respect the reduced motion preference.' },
+    },
+  },
   title: 'Overlay/DropdownMenu',
   component: DropdownMenu,
 }

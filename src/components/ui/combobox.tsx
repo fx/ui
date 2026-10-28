@@ -393,34 +393,43 @@ function ComboboxSearch({ className, ...props }: ComboboxSearchProps) {
 // ComboboxContent — Portal + Positioner + Popup
 // ---------------------------------------------------------------------------
 
-function ComboboxContent({
-  className,
-  children,
-  ...props
-}: React.ComponentPropsWithRef<typeof BaseCombobox.Popup>) {
-  const { variant, anchorRef } = useComboboxContext()
+interface ComboboxContentProps extends React.ComponentPropsWithRef<typeof BaseCombobox.Popup> {
+  /** Render within the current DOM tree, for example inside a dialog. */
+  portal?: boolean
+}
 
-  return (
-    <BaseCombobox.Portal className="fixed inset-0 z-[60] pointer-events-none [&>*]:pointer-events-auto">
-      <BaseCombobox.Positioner
-        sideOffset={variant === 'dropdown' ? 4 : -1}
-        anchor={variant === 'default' ? anchorRef : undefined}
-        align={variant === 'dropdown' ? 'start' : undefined}
+function ComboboxContent({ className, children, portal = true, ...props }: ComboboxContentProps) {
+  const { variant, anchorRef } = useComboboxContext()
+  const containerRef = React.useRef<HTMLDivElement>(null)
+
+  const content = (
+    <BaseCombobox.Positioner
+      sideOffset={variant === 'dropdown' ? 4 : -1}
+      {...(variant === 'default' ? { anchor: anchorRef } : { align: 'start' as const })}
+    >
+      <BaseCombobox.Popup
+        data-slot="combobox-content"
+        className={cn(
+          'relative z-[60] max-h-[min(var(--available-height),24rem)] overflow-y-auto overflow-x-hidden bg-popover p-1 text-popover-foreground shadow-md',
+          variant === 'default' && 'w-[var(--anchor-width)] border border-t-0 border-ring',
+          variant === 'dropdown' && 'min-w-[12rem] max-w-[20rem] rounded-md border border-border',
+          className,
+        )}
+        {...props}
       >
-        <BaseCombobox.Popup
-          data-slot="combobox-content"
-          className={cn(
-            'relative z-[60] max-h-[min(var(--available-height),24rem)] overflow-y-auto overflow-x-hidden bg-popover p-1 text-popover-foreground shadow-md',
-            variant === 'default' && 'w-[var(--anchor-width)] border border-t-0 border-ring',
-            variant === 'dropdown' && 'min-w-[12rem] max-w-[20rem] rounded-md border border-border',
-            className,
-          )}
-          {...props}
-        >
-          {children}
-        </BaseCombobox.Popup>
-      </BaseCombobox.Positioner>
+        {children}
+      </BaseCombobox.Popup>
+    </BaseCombobox.Positioner>
+  )
+
+  return portal ? (
+    <BaseCombobox.Portal className="fixed inset-0 z-[60] pointer-events-none [&>*]:pointer-events-auto">
+      {content}
     </BaseCombobox.Portal>
+  ) : (
+    <div ref={containerRef} data-slot="combobox-portal-container">
+      <BaseCombobox.Portal container={containerRef}>{content}</BaseCombobox.Portal>
+    </div>
   )
 }
 
@@ -663,6 +672,7 @@ export {
 export type {
   ComboboxChipsProps,
   ComboboxContextValue,
+  ComboboxContentProps,
   ComboboxInputProps,
   ComboboxItemProps,
   ComboboxProps,

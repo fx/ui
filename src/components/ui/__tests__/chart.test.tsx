@@ -1,3 +1,6 @@
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { compile } from '@tailwindcss/node'
 import { render, screen } from '@testing-library/react'
 import { Bar, BarChart } from 'recharts'
 import { describe, expect, it, vi } from 'vitest'
@@ -26,6 +29,25 @@ const testData = [
 ]
 
 describe('ChartContainer', () => {
+  it('generates valid selectors for chart stroke colors', async () => {
+    render(
+      <ChartContainer config={testConfig} data-testid="chart">
+        <BarChart data={testData}>
+          <Bar dataKey="value" />
+        </BarChart>
+      </ChartContainer>,
+    )
+    const base = join(dirname(fileURLToPath(import.meta.url)), '../../../..')
+    const compiler = await compile('@import "./src/styles/globals.css";', {
+      base,
+      onDependency() {},
+    })
+    const css = compiler.build([...screen.getByTestId('chart').classList])
+    expect(css.match(/stroke="#ccc"/g)).toHaveLength(3)
+    expect(css.match(/stroke="#fff"/g)).toHaveLength(2)
+    expect(css).not.toMatch(/stroke=#[a-f0-9]+\]/)
+  })
+
   it('renders with data-slot', () => {
     render(
       <ChartContainer config={testConfig} data-testid="chart">

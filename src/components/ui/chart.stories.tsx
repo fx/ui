@@ -28,6 +28,11 @@ const config: ChartConfig = {
 
 const meta: Meta<typeof ChartContainer> = {
   title: 'Complex/Chart',
+  parameters: {
+    docs: {
+      description: { component: 'Chart grids, dots, and reference lines use theme colors.' },
+    },
+  },
   component: ChartContainer,
 }
 
