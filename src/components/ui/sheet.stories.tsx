@@ -58,3 +58,21 @@ export const FlushBottom: Story = {
     </Sheet>
   ),
 }
+
+export const TallContent: Story = {
+  args: { side: 'top' },
+  render: ({ side }) => (
+    <Sheet>
+      <SheetTrigger render={<Button variant="outline" />}>Open tall sheet</SheetTrigger>
+      <SheetContent side={side}>
+        <SheetHeader>
+          <SheetTitle>Tall content</SheetTitle>
+          <SheetDescription>Scroll to the end of the sheet.</SheetDescription>
+        </SheetHeader>
+        {Array.from({ length: 30 }, (_, index) => `Item ${index + 1}`).map((item) => (
+          <p key={item}>{item}</p>
+        ))}
+      </SheetContent>
+    </Sheet>
+  ),
+}

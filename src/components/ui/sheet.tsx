@@ -44,7 +44,7 @@ const sheetContentVariants = cva(
   {
     variants: {
       side: {
-        top: 'inset-x-0 top-0 border-b data-[starting-style]:-translate-y-full data-[ending-style]:-translate-y-full',
+        top: 'inset-x-0 top-0 max-h-dvh border-b data-[starting-style]:-translate-y-full data-[ending-style]:-translate-y-full',
         bottom:
           'inset-x-0 bottom-0 max-h-[85dvh] border-t pb-[max(1.5rem,env(safe-area-inset-bottom))] data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full',
         left: 'inset-y-0 left-0 h-full w-3/4 border-r sm:max-w-sm data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full',
