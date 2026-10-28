@@ -1,23 +1,30 @@
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
 import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { transform } from 'lightningcss'
 
 const root = process.cwd()
-const fixture = await mkdtemp(join(root, 'node_modules', '.package-test-'))
+const fixture = await mkdtemp(join(tmpdir(), 'fx-ui-package-test-'))
 const run = (command, args, cwd = fixture) =>
   execFileSync(command, args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
 
 try {
-  const packed = run(
-    'npm',
-    ['pack', '--ignore-scripts', '--pack-destination', fixture],
-    root,
-  ).trim()
+  run('npm', ['pack', '--ignore-scripts', '--pack-destination', fixture], root)
+  const { version } = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'))
+  const tarballs = (await readdir(fixture)).filter((name) => name.endsWith('.tgz'))
+  assert.deepEqual(tarballs, [`fx-ui-${version}.tgz`])
+  const [packed] = tarballs
   const destination = join(fixture, 'node_modules/@fx/ui')
-  await mkdir(destination, { recursive: true })
-  run('tar', ['-xzf', join(fixture, packed), '-C', destination, '--strip-components=1'])
+  await writeFile(
+    join(fixture, 'package.json'),
+    JSON.stringify({
+      private: true,
+      dependencies: { '@fx/ui': `file:./${packed}`, react: '19.2.4', 'react-dom': '19.2.4' },
+    }),
+  )
+  run('npm', ['install', '--ignore-scripts', '--no-package-lock', '--no-audit', '--no-fund'])
   const files = await readdir(join(destination, 'dist'))
   assert.deepEqual(files.sort(), ['index.cjs', 'index.d.cts', 'index.d.ts', 'index.js', 'styles'])
 
@@ -31,6 +38,20 @@ try {
   )
   run(process.execPath, ['esm.mjs'])
   run(process.execPath, ['cjs.cjs'])
+
+  run('npm', [
+    'install',
+    '--ignore-scripts',
+    '--no-package-lock',
+    '--no-audit',
+    '--no-fund',
+    '--no-save',
+    '@types/react@19.2.14',
+    '@types/react-dom@19.2.3',
+    'typescript@5.9.3',
+    'vite@7.3.1',
+    '@tailwindcss/vite@4.2.1',
+  ])
 
   await writeFile(
     join(fixture, 'consumer.mts'),
@@ -63,7 +84,7 @@ void [ui.Button, props]
       files: ['consumer.mts', 'consumer.cts'],
     }),
   )
-  run(join(root, 'node_modules/.bin/tsc'), ['-p', 'tsconfig.json'])
+  run(join(fixture, 'node_modules/.bin/tsc'), ['-p', 'tsconfig.json'])
   await writeFile(
     join(fixture, 'tsconfig-bundler.json'),
     JSON.stringify({
@@ -78,7 +99,7 @@ void [ui.Button, props]
       files: ['consumer.mts'],
     }),
   )
-  run(join(root, 'node_modules/.bin/tsc'), ['-p', 'tsconfig-bundler.json'])
+  run(join(fixture, 'node_modules/.bin/tsc'), ['-p', 'tsconfig-bundler.json'])
 
   await mkdir(join(fixture, 'src'))
   await writeFile(
@@ -101,7 +122,7 @@ void [ui.Button, props]
     join(fixture, 'vite.config.mjs'),
     "import { defineConfig } from 'vite'\nimport tailwindcss from '@tailwindcss/vite'\nexport default defineConfig({ plugins: [tailwindcss()] })\n",
   )
-  run(join(root, 'node_modules/.bin/vite'), ['build'])
+  run(join(fixture, 'node_modules/.bin/vite'), ['build'])
   const assets = join(fixture, 'dist/assets')
   const cssName = (await readdir(assets)).find((name) => name.endsWith('.css'))
   assert.ok(cssName)
