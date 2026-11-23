@@ -7,6 +7,7 @@ export {
 } from './components/streamer-mode-provider'
 // Theme
 export { ThemeProvider, useTheme } from './components/theme-provider'
+export { type IdentityTone, identityIndex } from './lib/identity'
 export { mergeRefs, Slot, type SlotProps } from './lib/slot'
 export { cn, formatFullTime, formatRelativeTime } from './lib/utils'
 
