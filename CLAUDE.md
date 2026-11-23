@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-`@fx/ui` — React component library. 28 components built on Base UI primitives with Tailwind CSS v4 and neutral greyscale oklch theming.
+`@fx/ui` — React component library. 41 components built on Base UI primitives with Tailwind CSS v4 and neutral greyscale oklch theming.
 
 ## IMPORTANT: Public Repository Rules
 
@@ -22,7 +22,7 @@ All documentation, comments, and commit messages must be written as if for a pub
 ```sh
 bun install              # Install dependencies
 bun run build            # Build library (ESM + CJS + types + globals.css)
-bun run test             # Run all tests (300 tests across 30 suites)
+bun run test             # Run all tests (694 tests across 49 suites)
 bun run test -- button   # Run tests matching "button"
 bun run lint             # Lint with Biome
 bun run lint:fix         # Lint and auto-fix
@@ -51,7 +51,7 @@ Every component follows the same structure (see `button.tsx` as reference):
 5. Apply `cn(variants({ variant, size }), className)` for class merging
 6. Export component, variants, and types as named exports
 
-**19 components use Base UI primitives**, 9 use plain HTML elements. Check the existing component to see which pattern applies.
+**18 components use Base UI primitives**, 23 use plain HTML elements. Check the existing component to see which pattern applies.
 
 ## Testing Pattern
 
