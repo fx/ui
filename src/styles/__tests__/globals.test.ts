@@ -121,6 +121,24 @@ describe('globals.css', () => {
     expect(css).toContain('color: var(--identity-3-foreground)')
   })
 
+  it('maps Prose typography colours onto theme tokens', () => {
+    const block = themeBlock('[data-slot="prose"]')
+    for (const [name, token] of [
+      ['body', 'foreground'],
+      ['headings', 'foreground'],
+      ['links', 'foreground'],
+      ['code', 'foreground'],
+      ['pre-code', 'foreground'],
+      ['bullets', 'muted-foreground'],
+      ['quotes', 'muted-foreground'],
+      ['hr', 'border'],
+      ['td-borders', 'border'],
+      ['pre-bg', 'muted'],
+    ]) {
+      expect(block).toContain(`--tw-prose-${name}: var(--${token});`)
+    }
+  })
+
   it('references at least one external package', () => {
     // Guards the guard: a regex that silently stops matching would otherwise
     // turn this suite into a no-op.

@@ -196,6 +196,7 @@ export {
   type PopoverTriggerProps,
 } from './components/ui/popover'
 export { Progress, type ProgressProps } from './components/ui/progress'
+export { Prose, type ProseProps, proseVariants } from './components/ui/prose'
 export { getStreamerColor, Redacted, type RedactedProps } from './components/ui/redacted'
 export {
   Select,
