@@ -98,7 +98,7 @@ dependency of `@fx/ui`, so no extra install is needed.
 
 ## Comment threads
 
-The comment-thread parts are presentational and compose like `Card`: they render whatever you pass in and do no data fetching or Markdown parsing.
+The comment-thread parts are presentational and compose like `Card`: they render whatever you pass in and do no data fetching or Markdown parsing. Rendering Markdown or HTML into React nodes is the consumer's job, so `comment.content` below is already-rendered React content, not an HTML string.
 
 ```tsx
 import {
@@ -131,7 +131,7 @@ function Comments({ comments }) {
               </CommentHeader>
               <CommentBody>
                 <ClampedContent>
-                  <Prose size="sm" compactHeadings>{comment.html}</Prose>
+                  <Prose size="sm" compactHeadings>{comment.content}</Prose>
                 </ClampedContent>
               </CommentBody>
             </Comment>
@@ -153,7 +153,7 @@ A square avatar with initials (derived from `label` unless `initials` is given) 
 
 ### Prose
 
-Typography wrapper for rich text. Its `--tw-prose-*` colours map onto the theme tokens, so it follows light and dark mode without `prose-invert`. `size` is `sm` or `base`; `compactHeadings` keeps headings at body size so content never outweighs a surrounding header.
+Typography wrapper for rich text. It styles the React children you pass and does not parse Markdown or render HTML strings. Its `--tw-prose-*` colours map onto the theme tokens, so it follows light and dark mode without `prose-invert`. `size` is `sm` or `base`; `compactHeadings` keeps headings at body size so content never outweighs a surrounding header.
 
 ### ClampedContent
 

@@ -44,7 +44,7 @@ interface ProseProps extends React.HTMLAttributes<HTMLDivElement> {
 
 /**
  * Typography wrapper for rich text (rendered Markdown, articles) whose colours follow the
- * theme tokens.
+ * theme tokens. It styles React children only; parse Markdown or HTML into React nodes first.
  */
 function Prose({ size, compactHeadings, className, ref, ...props }: ProseProps) {
   return (
