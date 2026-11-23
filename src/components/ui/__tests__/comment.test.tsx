@@ -130,6 +130,24 @@ describe('Comment parts', () => {
     expect(action.className).toContain('shrink-0')
   })
 
+  it('CommentHeader lets long unbroken author and meta text wrap', () => {
+    const longName = 'a'.repeat(60)
+    render(
+      <CommentHeader data-testid="header">
+        <CommentAuthor name={longName} meta={'m'.repeat(60)} />
+        <CommentMeta data-testid="meta">{'b'.repeat(60)}</CommentMeta>
+        <CommentAction>
+          <button type="button">More</button>
+        </CommentAction>
+      </CommentHeader>,
+    )
+    const content = screen.getByTestId('header').querySelector('[data-slot=comment-header-content]')
+    expect(content?.className).toContain('[overflow-wrap:anywhere]')
+    expect(screen.getByText(longName).className).toContain('min-w-0')
+    expect(screen.getByText('m'.repeat(60)).className).toContain('min-w-0')
+    expect(screen.getByTestId('meta').className).toContain('min-w-0')
+  })
+
   it('CommentHeader keeps a single region when there is no action', () => {
     render(
       <CommentHeader data-testid="header">

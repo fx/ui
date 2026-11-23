@@ -77,7 +77,7 @@ function CommentHeader({ className, ref, children, ...props }: CommentHeaderProp
     >
       <div
         data-slot="comment-header-content"
-        className="flex min-h-6 min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1"
+        className="flex min-h-6 min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1 [overflow-wrap:anywhere]"
       >
         {content}
       </div>
@@ -103,11 +103,14 @@ function CommentAuthor({ avatar, name, meta, className, ref, ...props }: Comment
       {...props}
     >
       {avatar}
-      <span data-slot="comment-author-name" className="text-sm font-semibold text-foreground">
+      <span
+        data-slot="comment-author-name"
+        className="min-w-0 text-sm font-semibold text-foreground"
+      >
         {name}
       </span>
       {meta !== undefined && meta !== null && (
-        <span data-slot="comment-author-meta" className="text-xs text-muted-foreground">
+        <span data-slot="comment-author-meta" className="min-w-0 text-xs text-muted-foreground">
           {meta}
         </span>
       )}
@@ -124,7 +127,7 @@ function CommentMeta({ className, ref, ...props }: CommentMetaProps) {
     <span
       ref={ref}
       data-slot="comment-meta"
-      className={cn('text-xs text-muted-foreground', className)}
+      className={cn('min-w-0 text-xs text-muted-foreground', className)}
       {...props}
     />
   )
