@@ -274,6 +274,17 @@ export {
 export { Textarea, type TextareaProps } from './components/ui/textarea'
 export { ThemeToggle, type ThemeToggleProps } from './components/ui/theme-toggle'
 export {
+  type CollapsedRange,
+  Thread,
+  ThreadExpander,
+  type ThreadExpanderProps,
+  ThreadItem,
+  type ThreadItemProps,
+  type ThreadProps,
+  type UseCollapsedRangeOptions,
+  useCollapsedRange,
+} from './components/ui/thread'
+export {
   ToastClose,
   ToastDescription,
   ToastProvider,
