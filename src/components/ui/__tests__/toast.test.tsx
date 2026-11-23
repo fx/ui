@@ -1,5 +1,6 @@
-import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { act, render, screen } from '@testing-library/react'
+import { StrictMode, useEffect, useRef } from 'react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   ToastClose,
   ToastDescription,
@@ -7,6 +8,7 @@ import {
   ToastRoot,
   ToastTitle,
   ToastViewport,
+  useToastManager,
 } from '../toast'
 
 // Mock toast object matching Base UI's expected shape
@@ -135,5 +137,69 @@ describe('Toast', () => {
     const mod = await import('../toast')
     expect(mod.useToastManager).toBeDefined()
     expect(typeof mod.useToastManager).toBe('function')
+  })
+})
+
+describe('auto-dismiss timers', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  function AddOnMount({ onClose }: { onClose: () => void }) {
+    const toastManager = useToastManager()
+    const addedRef = useRef(false)
+    useEffect(() => {
+      if (addedRef.current) return
+      addedRef.current = true
+      toastManager.add({ title: 'Saved', timeout: 1000, onClose })
+    }, [toastManager, onClose])
+    return null
+  }
+
+  function renderWithToast(ui: React.ReactNode) {
+    return render(
+      <ToastProvider>
+        {ui}
+        <ToastViewport />
+      </ToastProvider>,
+    )
+  }
+
+  it('closes a toast once its timeout elapses', () => {
+    const onClose = vi.fn()
+    renderWithToast(<AddOnMount onClose={onClose} />)
+    act(() => {
+      vi.advanceTimersByTime(1000)
+    })
+    expect(onClose).toHaveBeenCalledTimes(1)
+  })
+
+  it('clears pending timers when the provider unmounts', () => {
+    const onClose = vi.fn()
+    const { unmount } = renderWithToast(<AddOnMount onClose={onClose} />)
+    unmount()
+    expect(vi.getTimerCount()).toBe(0)
+    vi.advanceTimersByTime(1000)
+    expect(onClose).not.toHaveBeenCalled()
+  })
+
+  it('still closes a toast added on mount under StrictMode', () => {
+    const onClose = vi.fn()
+    render(
+      <StrictMode>
+        <ToastProvider>
+          <AddOnMount onClose={onClose} />
+          <ToastViewport />
+        </ToastProvider>
+      </StrictMode>,
+    )
+    act(() => {
+      vi.advanceTimersByTime(1000)
+    })
+    expect(onClose).toHaveBeenCalledTimes(1)
   })
 })
