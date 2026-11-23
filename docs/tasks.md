@@ -6,6 +6,8 @@ Catch-all task list for work not tracked in a specific [change document](changes
 
 ## Completed
 
+- [x] Clear pending toast auto-dismiss timers when the toast provider unmounts.
+
 - [x] Add reusable copy, command block, and theme toggle components.
 
 - [x] Keep published component class scanning focused and generate valid chart selectors.
