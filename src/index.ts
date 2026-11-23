@@ -7,6 +7,7 @@ export {
 } from './components/streamer-mode-provider'
 // Theme
 export { ThemeProvider, useTheme } from './components/theme-provider'
+export { type IdentityTone, identityIndex } from './lib/identity'
 export { mergeRefs, Slot, type SlotProps } from './lib/slot'
 export { cn, formatFullTime, formatRelativeTime } from './lib/utils'
 
@@ -38,6 +39,12 @@ export {
 } from './components/ui/alert-dialog'
 // Foundation
 export { AspectRatio, type AspectRatioProps } from './components/ui/aspect-ratio'
+export {
+  Avatar,
+  type AvatarProps,
+  type AvatarTone,
+  avatarVariants,
+} from './components/ui/avatar'
 export { Badge, type BadgeProps, badgeVariants } from './components/ui/badge'
 export { Button, type ButtonProps, buttonVariants } from './components/ui/button'
 export {
@@ -73,6 +80,7 @@ export {
 } from './components/ui/chart'
 // Form
 export { Checkbox, type CheckboxProps } from './components/ui/checkbox'
+export { ClampedContent, type ClampedContentProps } from './components/ui/clamped-content'
 export {
   Collapsible,
   CollapsibleContent,
@@ -119,6 +127,24 @@ export {
   useComboboxContext,
 } from './components/ui/combobox'
 export { CommandBlock, type CommandBlockProps } from './components/ui/command-block'
+export {
+  Comment,
+  type CommentAccent,
+  CommentAction,
+  type CommentActionProps,
+  CommentAuthor,
+  type CommentAuthorProps,
+  CommentBody,
+  type CommentBodyProps,
+  CommentFooter,
+  type CommentFooterProps,
+  CommentHeader,
+  type CommentHeaderProps,
+  CommentMeta,
+  type CommentMetaProps,
+  type CommentProps,
+  commentVariants,
+} from './components/ui/comment'
 export { ConfirmDialog, type ConfirmDialogProps } from './components/ui/confirm-dialog'
 export { CopyButton, type CopyButtonProps } from './components/ui/copy-button'
 export {
@@ -189,6 +215,7 @@ export {
   type PopoverTriggerProps,
 } from './components/ui/popover'
 export { Progress, type ProgressProps } from './components/ui/progress'
+export { Prose, type ProseProps, proseVariants } from './components/ui/prose'
 export { getStreamerColor, Redacted, type RedactedProps } from './components/ui/redacted'
 export {
   Select,
@@ -246,6 +273,17 @@ export {
 } from './components/ui/table'
 export { Textarea, type TextareaProps } from './components/ui/textarea'
 export { ThemeToggle, type ThemeToggleProps } from './components/ui/theme-toggle'
+export {
+  type CollapsedRange,
+  Thread,
+  ThreadExpander,
+  type ThreadExpanderProps,
+  ThreadItem,
+  type ThreadItemProps,
+  type ThreadProps,
+  type UseCollapsedRangeOptions,
+  useCollapsedRange,
+} from './components/ui/thread'
 export {
   ToastClose,
   ToastDescription,

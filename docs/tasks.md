@@ -14,3 +14,4 @@ Catch-all task list for work not tracked in a specific [change document](changes
 - [x] Add an accessible Slider with scalar and range values, keyboard support, stories, and runtime/type tests.
 - [x] Keep date range fields usable in constrained layouts.
 - [x] Match native date input controls to the active theme.
+- [x] Add avatar, prose, clamped content, comment and thread components with identity colour tokens.

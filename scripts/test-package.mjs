@@ -247,12 +247,17 @@ void [ui.Button, props]
     'size-10',
     '[stroke="#ccc"]',
     '[stroke="#fff"]',
+    'bg-identity-1',
+    'text-identity-8-foreground',
+    'border-l-identity-8',
+    'prose-sm',
   ]) {
     assert.ok(output.includes(token), `Missing generated CSS: ${token}`)
   }
   assert.ok(!output.includes('hsl(var(--primary))'), 'Invalid nested theme color')
   assert.ok(output.includes('background-color:var(--primary)'), 'Missing usable primary background')
-  assert.ok(!output.includes('.prose'), 'Unexpected typography utilities')
+  assert.ok(output.includes('background-color:var(--identity-1)'), 'Missing identity background')
+  assert.ok(output.includes('[data-slot=prose]'), 'Missing Prose token mapping')
   assert.deepEqual(
     transform({ filename: 'consumer.css', code: css, errorRecovery: true }).warnings,
     [],

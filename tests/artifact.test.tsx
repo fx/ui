@@ -75,6 +75,33 @@ describe.each([
     expect(screen.getByText('Value: 0')).toBeInTheDocument()
     expect(container.querySelector('[data-slot=chart-legend-content]')).toHaveTextContent('Total')
   })
+
+  it('renders a comment thread', () => {
+    render(
+      <ui.Thread aria-label="Comments">
+        <ui.ThreadItem>
+          <ui.ThreadExpander count={2} onExpand={() => {}} />
+        </ui.ThreadItem>
+        <ui.ThreadItem>
+          <ui.Comment accent={3}>
+            <ui.CommentHeader>
+              <ui.CommentAuthor avatar={<ui.Avatar label="Ada Lovelace" />} name="Ada Lovelace" />
+            </ui.CommentHeader>
+            <ui.CommentBody>
+              <ui.ClampedContent>
+                <ui.Prose size="sm">Lorem ipsum</ui.Prose>
+              </ui.ClampedContent>
+            </ui.CommentBody>
+          </ui.Comment>
+        </ui.ThreadItem>
+      </ui.Thread>,
+    )
+    const thread = screen.getByRole('list', { name: 'Comments' })
+    expect(thread).toContainElement(screen.getByRole('img', { name: 'Ada Lovelace' }))
+    expect(screen.getByRole('button', { name: 'Show 2 earlier comments' })).toBeInTheDocument()
+    expect(screen.getByRole('article')).toHaveTextContent('Lorem ipsum')
+    expect(ui.identityIndex('a', 0xffffffff)).toBe(0xe40c292c + 1)
+  })
 })
 
 it('leaves Recharts external in both artifacts', () => {
