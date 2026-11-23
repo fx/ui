@@ -39,6 +39,12 @@ export {
 } from './components/ui/alert-dialog'
 // Foundation
 export { AspectRatio, type AspectRatioProps } from './components/ui/aspect-ratio'
+export {
+  Avatar,
+  type AvatarProps,
+  type AvatarTone,
+  avatarVariants,
+} from './components/ui/avatar'
 export { Badge, type BadgeProps, badgeVariants } from './components/ui/badge'
 export { Button, type ButtonProps, buttonVariants } from './components/ui/button'
 export {
