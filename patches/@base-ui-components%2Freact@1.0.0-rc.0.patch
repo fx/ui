@@ -32,3 +32,55 @@ index 7c5d920b0b7160e01c9b76ebf2d58969e0ca9dac..eb4e381a1bbfb292a6dbe721251b8e6e
      openInteractionType: openMethod,
      initialFocus: resolvedInitialFocus,
      returnFocus: resolvedFinalFocus,
+diff --git a/esm/toast/provider/ToastProvider.js b/esm/toast/provider/ToastProvider.js
+index 4184d3c1ce1d26c39baab7baf58eec66f630b245..6e386c8e2355bb2e325f8bd38874035f54dc1f62 100644
+--- a/esm/toast/provider/ToastProvider.js
++++ b/esm/toast/provider/ToastProvider.js
+@@ -105,6 +105,21 @@ export const ToastProvider = function ToastProvider(props) {
+       timer.start = Date.now();
+     });
+   });
++  const timersSuspendedRef = React.useRef(false);
++  React.useEffect(function disposeTimers() {
++    // Restart timers suspended by a re-run of this effect (e.g. StrictMode).
++    if (timersSuspendedRef.current) {
++      timersSuspendedRef.current = false;
++      resumeTimers();
++    }
++    return () => {
++      if (!isPausedRef.current) {
++        pauseTimers();
++        timersSuspendedRef.current = true;
++      }
++      timersRef.current.forEach(timer => timer.timeout?.clear());
++    };
++  }, [pauseTimers, resumeTimers]);
+   const close = useStableCallback(toastId => {
+     setToasts(prevToasts => {
+       const toastsWithEnding = prevToasts.map(toast => toast.id === toastId ? {
+diff --git a/toast/provider/ToastProvider.js b/toast/provider/ToastProvider.js
+index 89737bcf10e27e8a6845b050ba56094249a1a66b..ef417b200e3de708a07c1e2305b3b3367584b71e 100644
+--- a/toast/provider/ToastProvider.js
++++ b/toast/provider/ToastProvider.js
+@@ -111,6 +111,21 @@ const ToastProvider = exports.ToastProvider = function ToastProvider(props) {
+       timer.start = Date.now();
+     });
+   });
++  const timersSuspendedRef = React.useRef(false);
++  React.useEffect(function disposeTimers() {
++    // Restart timers suspended by a re-run of this effect (e.g. StrictMode).
++    if (timersSuspendedRef.current) {
++      timersSuspendedRef.current = false;
++      resumeTimers();
++    }
++    return () => {
++      if (!isPausedRef.current) {
++        pauseTimers();
++        timersSuspendedRef.current = true;
++      }
++      timersRef.current.forEach(timer => timer.timeout?.clear());
++    };
++  }, [pauseTimers, resumeTimers]);
+   const close = (0, _useStableCallback.useStableCallback)(toastId => {
+     setToasts(prevToasts => {
+       const toastsWithEnding = prevToasts.map(toast => toast.id === toastId ? {
