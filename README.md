@@ -161,7 +161,7 @@ Clips content taller than `maxHeight` (default `20rem`) behind a fade (`fadeFrom
 
 ### Comment
 
-`Comment` is an `<article>` card with a 2px left stripe in its `accent` (`neutral`, `inverse` or `1`–`8`) and an optional `highlighted` ring. Compose it with `CommentHeader`, `CommentAuthor` (`avatar`, `name`, `meta`), `CommentMeta`, `CommentAction`, `CommentBody` and `CommentFooter`.
+`Comment` is an `<article>` card with a 2px left stripe in its `accent` (`neutral`, `inverse` or `1`–`8`) and an optional `highlighted` ring. Compose it with `CommentHeader`, `CommentAuthor` (`avatar`, `name`, `meta`), `CommentMeta`, `CommentAction`, `CommentBody` and `CommentFooter`. A `CommentAction` placed directly in `CommentHeader` stays pinned top-right while the rest of the header wraps on narrow screens.
 
 ### Thread
 

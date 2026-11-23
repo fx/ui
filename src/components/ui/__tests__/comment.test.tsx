@@ -98,11 +98,47 @@ describe('Comment parts', () => {
     expect(ref.current?.className).toContain('custom-class')
   })
 
-  it('CommentHeader wraps and separates itself from the body', () => {
+  it('CommentHeader separates itself from the body without wrapping its action', () => {
     render(<CommentHeader data-testid="header" />)
     const classes = screen.getByTestId('header').className
-    expect(classes).toContain('flex-wrap')
     expect(classes).toContain('border-b')
+    expect(classes).not.toContain('flex-wrap')
+  })
+
+  it('CommentHeader wraps author and meta in their own region and keeps the action pinned', () => {
+    render(
+      <CommentHeader data-testid="header">
+        <CommentAuthor name="Ada Lovelace" meta="maintainer" />
+        <CommentMeta>· 12 min ago</CommentMeta>
+        <CommentAction data-testid="action">
+          <button type="button">More</button>
+        </CommentAction>
+      </CommentHeader>,
+    )
+    const header = screen.getByTestId('header')
+    const content = header.querySelector('[data-slot=comment-header-content]')
+    const action = screen.getByTestId('action')
+    expect(content).not.toBeNull()
+    expect(content?.className).toContain('flex-wrap')
+    expect(content?.className).toContain('flex-1')
+    expect(content?.className).toContain('min-w-0')
+    expect(content).toContainElement(screen.getByText('Ada Lovelace'))
+    expect(content).toContainElement(screen.getByText('· 12 min ago'))
+    expect(content).not.toContainElement(action)
+    expect(action.parentElement).toBe(header)
+    expect(header.lastElementChild).toBe(action)
+    expect(action.className).toContain('shrink-0')
+  })
+
+  it('CommentHeader keeps a single region when there is no action', () => {
+    render(
+      <CommentHeader data-testid="header">
+        <CommentAuthor name="Grace Hopper" />
+      </CommentHeader>,
+    )
+    const header = screen.getByTestId('header')
+    expect(header.children).toHaveLength(1)
+    expect(header.firstElementChild).toHaveAttribute('data-slot', 'comment-header-content')
   })
 
   it('CommentMeta renders muted inline text', () => {

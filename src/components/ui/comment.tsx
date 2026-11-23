@@ -1,5 +1,5 @@
 import { cva } from 'class-variance-authority'
-import type * as React from 'react'
+import * as React from 'react'
 import type { IdentityTone } from '@/lib/identity'
 import { cn } from '@/lib/utils'
 
@@ -57,17 +57,32 @@ interface CommentHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   ref?: React.Ref<HTMLDivElement>
 }
 
-function CommentHeader({ className, ref, ...props }: CommentHeaderProps) {
+/**
+ * The comment's header row. Direct `CommentAction` children stay pinned at the end while the
+ * rest (author, meta, time) wraps inside its own region on narrow screens.
+ */
+function CommentHeader({ className, ref, children, ...props }: CommentHeaderProps) {
+  const content: React.ReactNode[] = []
+  const actions: React.ReactNode[] = []
+  for (const child of React.Children.toArray(children)) {
+    if (React.isValidElement(child) && child.type === CommentAction) actions.push(child)
+    else content.push(child)
+  }
   return (
     <div
       ref={ref}
       data-slot="comment-header"
-      className={cn(
-        'flex min-w-0 flex-wrap items-center gap-2 border-b bg-muted/50 px-3 py-2',
-        className,
-      )}
+      className={cn('flex min-w-0 items-start gap-2 border-b bg-muted/50 px-3 py-2', className)}
       {...props}
-    />
+    >
+      <div
+        data-slot="comment-header-content"
+        className="flex min-h-6 min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1"
+      >
+        {content}
+      </div>
+      {actions}
+    </div>
   )
 }
 
@@ -124,7 +139,7 @@ function CommentAction({ className, ref, ...props }: CommentActionProps) {
     <div
       ref={ref}
       data-slot="comment-action"
-      className={cn('ml-auto flex items-center gap-1', className)}
+      className={cn('ml-auto flex min-h-6 shrink-0 items-center gap-1', className)}
       {...props}
     />
   )
