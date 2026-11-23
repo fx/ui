@@ -80,6 +80,7 @@ export {
 } from './components/ui/chart'
 // Form
 export { Checkbox, type CheckboxProps } from './components/ui/checkbox'
+export { ClampedContent, type ClampedContentProps } from './components/ui/clamped-content'
 export {
   Collapsible,
   CollapsibleContent,
