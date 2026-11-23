@@ -127,6 +127,24 @@ export {
   useComboboxContext,
 } from './components/ui/combobox'
 export { CommandBlock, type CommandBlockProps } from './components/ui/command-block'
+export {
+  Comment,
+  type CommentAccent,
+  CommentAction,
+  type CommentActionProps,
+  CommentAuthor,
+  type CommentAuthorProps,
+  CommentBody,
+  type CommentBodyProps,
+  CommentFooter,
+  type CommentFooterProps,
+  CommentHeader,
+  type CommentHeaderProps,
+  CommentMeta,
+  type CommentMetaProps,
+  type CommentProps,
+  commentVariants,
+} from './components/ui/comment'
 export { ConfirmDialog, type ConfirmDialogProps } from './components/ui/confirm-dialog'
 export { CopyButton, type CopyButtonProps } from './components/ui/copy-button'
 export {
